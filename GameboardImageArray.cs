@@ -55,8 +55,9 @@ namespace GameboardGUI
         /// <param name="bottomX">The position of the bottom right corner of the game board relative to the parentForm's right border</param>
         /// <param name="tileMargin">The gap between each image, e.g., Top, Left, Right and Bottom </param>
         /// <param name="tileImagePath">The literal path to each image</param>
-        public GameboardImageArray(Form parentForm, int[,] gameBoardStateArray, Point topCorner, 
-            Point bottomCorner, int tileMargin, string tileImagePath) {
+        public GameboardImageArray(Form parentForm, int[,] gameBoardStateArray, Point topCorner,
+            Point bottomCorner, int tileMargin, string tileImagePath)
+        {
             _containingForm = parentForm;
             _boardRows = gameBoardStateArray.GetLength(0);
             _boardCols = gameBoardStateArray.GetLength(1);
@@ -66,8 +67,8 @@ namespace GameboardGUI
             // Calculate the available Width for the game board, based on the size of the parent form and provided board parameters
             int boardWidth = parentForm.ClientSize.Width - ((topCorner.X + bottomCorner.X) + (tileMargin * _boardRows - 1));
             _topY = topCorner.Y;
-            _topX= topCorner.X;
-            this._tileMargin = tileMargin;
+            _topX = topCorner.X;
+            _tileMargin = tileMargin;
             _tileImagesPath = tileImagePath;
 
             _tileWidth = ComputeTileWidth(boardWidth);
@@ -101,7 +102,7 @@ namespace GameboardGUI
                 }
             }
         }
-        
+
         /// <summary>
         /// Updates the Game Board display based on the gameboard state data array parameter
         /// </summary>
@@ -116,7 +117,7 @@ namespace GameboardGUI
                 }
             }
         }
-        
+
         /// <summary>
         /// Returns the index of the Column, of the selected object, e.g., the images clicked on by the mouse
         /// </summary>
@@ -157,7 +158,7 @@ namespace GameboardGUI
             }
             return -1;
         }
-       
+
         /// <summary>
         /// GetTile is passed the row and column indices and returns the 
         /// PictureBox at the indexed location
@@ -169,7 +170,7 @@ namespace GameboardGUI
         {
             return _boardTiles[row, col];
         }
-        
+
         /// <summary>
         /// SetTile sets the image at the specified row and column index to the image specified by imageName
         /// </summary>
@@ -182,7 +183,7 @@ namespace GameboardGUI
             _boardTiles[row, col].ImageLocation = _tileImagesPath + imageName + ".PNG";
             return true;
         }
-        
+
         /// <summary>
         /// Changes all images within the array to Red.png or Blue.png.
         /// Use this to change all the tiles to Red or Blue.
@@ -192,13 +193,16 @@ namespace GameboardGUI
         /// <param name="tileColor">This is the filename stored within the default image location e.g. Red or Blue</param>
         public void ToRedOrBlueBoard(string tileColor = "Blue")
         {
-            switch(tileColor[0].ToString().ToLower())
+            switch (tileColor[0].ToString().ToLower())
             {
-                case "r": tileColor = "Red";
+                case "r":
+                    tileColor = "Red";
                     break;
-                case "b": tileColor = "Blue";
+                case "b":
+                    tileColor = "Blue";
                     break;
-                default: tileColor = "Blue";
+                default:
+                    tileColor = "Blue";
                     break;
             }
             for (int r = 0; r < _boardRows; r++)
@@ -225,11 +229,11 @@ namespace GameboardGUI
             {
                 _boardTiles[row, c].ImageLocation = _tileImagesPath + updateArray[row, c].ToString() + ".PNG";
                 return true;
-            }            
-                
+            }
+
             return false;
         }
-        
+
         /// <summary>
         /// This method update the location of the images within the frame as the frame changes sizes.
         /// </summary>
@@ -301,18 +305,29 @@ namespace GameboardGUI
 
         private int ComputeTileHeight(int boardHeight)
         {
-            int tileHeight = boardHeight/_boardCols;
+            int tileHeight = boardHeight / _boardCols;
             return tileHeight;
         }
-        
+
+        private void InitializeComponent()
+        {
+            SuspendLayout();
+            // 
+            // GameboardImageArray
+            // 
+            Name = "GameboardImageArray";
+            Size = new Size(1000, 1000);
+            ResumeLayout(false);
+        }
+
         private int ComputeTileWidth(int boardWidth)
         {
-            int tileWidth = boardWidth/_boardRows;
+            int tileWidth = boardWidth / _boardRows;
             return tileWidth;
         }
     }
 
-    public class GameboardImageArraySizeException: Exception
+    public class GameboardImageArraySizeException : Exception
     {
         public GameboardImageArraySizeException() : base() { }
         public GameboardImageArraySizeException(string message) : base(message) { }

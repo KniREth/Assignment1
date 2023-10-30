@@ -34,6 +34,8 @@
             helpToolStripMenuItem = new ToolStripMenuItem();
             textBox1 = new TextBox();
             textBox2 = new TextBox();
+            lblP1Val = new Label();
+            lblP2Val = new Label();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -43,7 +45,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { gameToolStripMenuItem, settingsToolStripMenuItem, helpToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(800, 28);
+            menuStrip1.Size = new Size(782, 28);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -67,23 +69,45 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(156, 408);
+            textBox1.Location = new Point(224, 714);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(125, 27);
             textBox1.TabIndex = 1;
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(550, 410);
+            textBox2.Location = new Point(595, 714);
             textBox2.Name = "textBox2";
             textBox2.Size = new Size(125, 27);
             textBox2.TabIndex = 2;
+            // 
+            // lblP1Val
+            // 
+            lblP1Val.AutoSize = true;
+            lblP1Val.Font = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point);
+            lblP1Val.Location = new Point(26, 698);
+            lblP1Val.Name = "lblP1Val";
+            lblP1Val.Size = new Size(38, 46);
+            lblP1Val.TabIndex = 3;
+            lblP1Val.Text = "2";
+            // 
+            // lblP2Val
+            // 
+            lblP2Val.AutoSize = true;
+            lblP2Val.Font = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point);
+            lblP2Val.Location = new Point(425, 698);
+            lblP2Val.Name = "lblP2Val";
+            lblP2Val.Size = new Size(38, 46);
+            lblP2Val.TabIndex = 4;
+            lblP2Val.Text = "2";
             // 
             // BoardForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(782, 753);
+            Controls.Add(lblP2Val);
+            Controls.Add(lblP1Val);
             Controls.Add(textBox2);
             Controls.Add(textBox1);
             Controls.Add(menuStrip1);
@@ -104,5 +128,7 @@
         private ToolStripMenuItem helpToolStripMenuItem;
         private TextBox textBox1;
         private TextBox textBox2;
+        private Label lblP1Val;
+        private Label lblP2Val;
     }
 }
