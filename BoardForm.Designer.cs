@@ -32,11 +32,17 @@
             gameToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
-            textBox1 = new TextBox();
-            textBox2 = new TextBox();
+            txtBoxP1Name = new TextBox();
+            txtBoxP2Name = new TextBox();
             lblP1Val = new Label();
             lblP2Val = new Label();
+            pictureBox1 = new PictureBox();
+            pictureBox2 = new PictureBox();
+            pictureBox3 = new PictureBox();
             menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
@@ -67,55 +73,98 @@
             helpToolStripMenuItem.Size = new Size(55, 24);
             helpToolStripMenuItem.Text = "Help";
             // 
-            // textBox1
+            // txtBoxP1Name
             // 
-            textBox1.Location = new Point(224, 714);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(125, 27);
-            textBox1.TabIndex = 1;
+            txtBoxP1Name.Location = new Point(205, 715);
+            txtBoxP1Name.Name = "txtBoxP1Name";
+            txtBoxP1Name.PlaceholderText = "Enter name";
+            txtBoxP1Name.Size = new Size(125, 27);
+            txtBoxP1Name.TabIndex = 1;
+            txtBoxP1Name.TextChanged += textBox1_TextChanged;
             // 
-            // textBox2
+            // txtBoxP2Name
             // 
-            textBox2.Location = new Point(595, 714);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(125, 27);
-            textBox2.TabIndex = 2;
+            txtBoxP2Name.Location = new Point(595, 714);
+            txtBoxP2Name.Name = "txtBoxP2Name";
+            txtBoxP2Name.PlaceholderText = "Enter name";
+            txtBoxP2Name.Size = new Size(125, 27);
+            txtBoxP2Name.TabIndex = 2;
+            txtBoxP2Name.TextChanged += txtBoxP2Name_TextChanged;
             // 
             // lblP1Val
             // 
             lblP1Val.AutoSize = true;
+            lblP1Val.BackColor = Color.FromArgb(255, 192, 192);
             lblP1Val.Font = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point);
             lblP1Val.Location = new Point(26, 698);
             lblP1Val.Name = "lblP1Val";
-            lblP1Val.Size = new Size(38, 46);
+            lblP1Val.Size = new Size(63, 46);
             lblP1Val.TabIndex = 3;
-            lblP1Val.Text = "2";
+            lblP1Val.Text = "2 x";
             // 
             // lblP2Val
             // 
             lblP2Val.AutoSize = true;
+            lblP2Val.BackColor = Color.FromArgb(255, 192, 192);
             lblP2Val.Font = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point);
             lblP2Val.Location = new Point(425, 698);
             lblP2Val.Name = "lblP2Val";
-            lblP2Val.Size = new Size(38, 46);
+            lblP2Val.Size = new Size(63, 46);
             lblP2Val.TabIndex = 4;
-            lblP2Val.Text = "2";
+            lblP2Val.Text = "2 x";
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.BackColor = Color.FromArgb(255, 192, 192);
+            pictureBox1.Location = new Point(0, 689);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(782, 71);
+            pictureBox1.TabIndex = 5;
+            pictureBox1.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            pictureBox2.Location = new Point(121, 704);
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.Size = new Size(40, 40);
+            pictureBox2.TabIndex = 6;
+            pictureBox2.TabStop = false;
+            // 
+            // pictureBox3
+            // 
+            pictureBox3.BackColor = Color.Black;
+            pictureBox3.Location = new Point(520, 704);
+            pictureBox3.Name = "pictureBox3";
+            pictureBox3.Size = new Size(40, 40);
+            pictureBox3.TabIndex = 7;
+            pictureBox3.TabStop = false;
             // 
             // BoardForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(782, 753);
+            Controls.Add(pictureBox3);
+            Controls.Add(pictureBox2);
             Controls.Add(lblP2Val);
             Controls.Add(lblP1Val);
-            Controls.Add(textBox2);
-            Controls.Add(textBox1);
+            Controls.Add(txtBoxP2Name);
+            Controls.Add(txtBoxP1Name);
             Controls.Add(menuStrip1);
+            Controls.Add(pictureBox1);
             MainMenuStrip = menuStrip1;
+            MaximizeBox = false;
+            MaximumSize = new Size(800, 800);
+            MinimizeBox = false;
+            MinimumSize = new Size(800, 800);
             Name = "BoardForm";
-            Text = "Form1";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "O'Spookio";
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -126,9 +175,12 @@
         private ToolStripMenuItem gameToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
         private ToolStripMenuItem helpToolStripMenuItem;
-        private TextBox textBox1;
-        private TextBox textBox2;
+        private TextBox txtBoxP1Name;
+        private TextBox txtBoxP2Name;
         private Label lblP1Val;
         private Label lblP2Val;
+        private PictureBox pictureBox1;
+        private PictureBox pictureBox2;
+        private PictureBox pictureBox3;
     }
 }
