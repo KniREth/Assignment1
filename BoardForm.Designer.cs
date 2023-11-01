@@ -39,10 +39,12 @@
             pictureBox1 = new PictureBox();
             pictureBox2 = new PictureBox();
             pictureBox3 = new PictureBox();
+            picBoxPlayerToMove = new PictureBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)picBoxPlayerToMove).BeginInit();
             SuspendLayout();
             // 
             // menuStrip1
@@ -75,7 +77,7 @@
             // 
             // txtBoxP1Name
             // 
-            txtBoxP1Name.Location = new Point(205, 715);
+            txtBoxP1Name.Location = new Point(157, 715);
             txtBoxP1Name.Name = "txtBoxP1Name";
             txtBoxP1Name.PlaceholderText = "Enter name";
             txtBoxP1Name.Size = new Size(125, 27);
@@ -84,7 +86,7 @@
             // 
             // txtBoxP2Name
             // 
-            txtBoxP2Name.Location = new Point(595, 714);
+            txtBoxP2Name.Location = new Point(618, 714);
             txtBoxP2Name.Name = "txtBoxP2Name";
             txtBoxP2Name.PlaceholderText = "Enter name";
             txtBoxP2Name.Size = new Size(125, 27);
@@ -107,7 +109,7 @@
             lblP2Val.AutoSize = true;
             lblP2Val.BackColor = Color.FromArgb(255, 192, 192);
             lblP2Val.Font = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point);
-            lblP2Val.Location = new Point(425, 698);
+            lblP2Val.Location = new Point(484, 698);
             lblP2Val.Name = "lblP2Val";
             lblP2Val.Size = new Size(63, 46);
             lblP2Val.TabIndex = 4;
@@ -124,7 +126,7 @@
             // 
             // pictureBox2
             // 
-            pictureBox2.Location = new Point(121, 704);
+            pictureBox2.Location = new Point(95, 704);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(40, 40);
             pictureBox2.TabIndex = 6;
@@ -133,17 +135,27 @@
             // pictureBox3
             // 
             pictureBox3.BackColor = Color.Black;
-            pictureBox3.Location = new Point(520, 704);
+            pictureBox3.Location = new Point(563, 704);
             pictureBox3.Name = "pictureBox3";
             pictureBox3.Size = new Size(40, 40);
             pictureBox3.TabIndex = 7;
             pictureBox3.TabStop = false;
+            // 
+            // picBoxPlayerToMove
+            // 
+            picBoxPlayerToMove.Image = Properties.Resources.left;
+            picBoxPlayerToMove.Location = new Point(328, 704);
+            picBoxPlayerToMove.Name = "picBoxPlayerToMove";
+            picBoxPlayerToMove.Size = new Size(125, 40);
+            picBoxPlayerToMove.TabIndex = 8;
+            picBoxPlayerToMove.TabStop = false;
             // 
             // BoardForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(782, 753);
+            Controls.Add(picBoxPlayerToMove);
             Controls.Add(pictureBox3);
             Controls.Add(pictureBox2);
             Controls.Add(lblP2Val);
@@ -165,6 +177,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)picBoxPlayerToMove).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -182,5 +195,6 @@
         private PictureBox pictureBox1;
         private PictureBox pictureBox2;
         private PictureBox pictureBox3;
+        private PictureBox picBoxPlayerToMove;
     }
 }

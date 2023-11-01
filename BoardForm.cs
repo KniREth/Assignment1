@@ -4,19 +4,22 @@ namespace Assignment1
 {
     public partial class BoardForm : Form
     {
-        bool gamePlayable = false;
+        // Initialise bool for player entering name into txt box
         bool p1NameEntered = false;
         bool p2NameEntered = false;
 
         // Initialise the number of rows and columns for the board
         const int numRows = 8;
         const int numCols = 8;
-
+        
+        // Player 0 is white, player 1 is black. White plays first
         int player = 0;
 
+        // The initial number of tiles each player has on the board
         int blackTiles = 2;
         int whiteTiles = 2;
 
+        // Offsets are the tiles that surround the current tile
         List<Point> offsets = new List<Point>
         {
             new Point(-1, -1), // Diag up left
@@ -29,7 +32,7 @@ namespace Assignment1
             new Point(1, 1) // Diag down right
         };
 
-        // Initialise array of images for gameboard
+        // Initialise an array of pic boxes for board
         GameboardImageArray _gameBoardGui;
         int[,] gameBoardData;
         string tileImagesDirPath = Directory.GetCurrentDirectory() + @"\images\";
@@ -60,14 +63,19 @@ namespace Assignment1
             int[,] boardArray = new int[numRows, numCols];
             int boardVal = 0;
 
+            // For each row
             for (int row = 0; row < numRows; row++)
             {
+                // For each col
                 for (int col = 0; col < numCols; col++)
                 {
+                    // Set initial white board pieces
                     if ((row == 4 && col == 4) || (row == 3 && col == 3))
                     { boardVal = 0; }
+                    // Set initial black board pieces
                     else if ((row == 3 && col == 4) || (row == 4 && col == 3))
                     { boardVal = 1; }
+                    // Set rest of board as clear pieces
                     else boardVal = 10;
 
                     boardArray[row, col] = boardVal;
@@ -85,8 +93,10 @@ namespace Assignment1
             int selectionCol = _gameBoardGui.GetCurrentColumnIndex(sender);
             // MessageBox.Show($"You just clicked the square at row {selectionRow} and col {selectionCol}");
 
+            if (!p1NameEntered) { txtBoxP1Name.Text = "Player #1"; }
+            if (!p2NameEntered) { txtBoxP2Name.Text = "Player #2"; }
 
-            if (gamePlayable && gameBoardData[selectionRow, selectionCol] == 10)
+            if (gameBoardData[selectionRow, selectionCol] == 10)
             {
                 txtBoxP1Name.Enabled = false;
                 txtBoxP2Name.Enabled = false;
@@ -109,7 +119,28 @@ namespace Assignment1
                 }
             }
 
-            if (moveCheck) { player = (player + 1) % 2; }
+            // Check game over, 8x8 grid = 64 tiles, if all are filled, game is over
+            if (blackTiles + whiteTiles >= 64)
+            {
+                // Check which player wins, whoever has most tiles
+                if (whiteTiles > blackTiles)
+                {
+                    MessageBox.Show("Game over, White wins!");
+                }
+                else { MessageBox.Show("Game over, Black wins!"); }
+
+            }
+
+            // Check if the player has done a valid move
+            if (moveCheck)
+            { 
+                // Swap to next player's turn
+                player = (player + 1) % 2;
+
+                // Swap arrow img for next player move
+                if (player == 0) { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "left.PNG"; }
+                else { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "right.PNG"; }
+            }
 
         }
 
@@ -177,35 +208,17 @@ namespace Assignment1
             lblP1Val.Text = whiteTiles.ToString() + " x";
             lblP2Val.Text = blackTiles.ToString() + " x";
 
-            if (blackTiles + whiteTiles >= 64)
-            {
-                if (whiteTiles > blackTiles)
-                {
-                    MessageBox.Show("Game over, White wins!");
-                }
-                else { MessageBox.Show("Game over, Black wins!"); }
 
-            }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             p1NameEntered = true;
-            checkPlayable();
         }
 
         private void txtBoxP2Name_TextChanged(object sender, EventArgs e)
         {
             p2NameEntered = true;
-            checkPlayable();
-        }
-
-        private void checkPlayable()
-        {
-            if (p1NameEntered && p2NameEntered)
-            {
-                gamePlayable = true;
-            }
         }
     }
 }
