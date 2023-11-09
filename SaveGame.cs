@@ -28,7 +28,6 @@ namespace Assignment1
 
         public string Serialise()
         {
-            return JsonSerializer.Serialize(this);
-        }
+            return JsonSerializer.S
     }
 }

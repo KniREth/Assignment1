@@ -9,6 +9,8 @@ using Microsoft.VisualBasic;
 
 namespace Assignment1
 {
+
+    // TODO: Create a new class for game logic, makes everything more readable and modular
     public partial class BoardForm : Form
     {
         // Initialise bool for player entering name into txt box
@@ -136,7 +138,7 @@ namespace Assignment1
                 for (int x = 0; x < offsets.Count; x++)
                 {
                     // See if the current tile clicked is valid for the current offset
-                    var TileCheck = IsTileValid(selectionRow, selectionCol, offsets[x], new List<Point>(), 0);
+                    var TileCheck = IsTileValid(selectionRow, selectionCol, offsets[x], new List<Point>());
                     // Item 1 is a list of points which will be the visited tiles, Item 2 is a bool to see if the path reaches a clear tile
                     if (TileCheck.Item2 == true && TileCheck.Item1.Count > 0)
                     {
@@ -198,20 +200,39 @@ namespace Assignment1
 
             }
 
+            // Get all of the valid tiles for the player
             validTiles = GetValidTiles();
 
         }
 
+        /// <summary>
+        /// 
+        /// The SwapPlayer function will take the current player and set it to the  remainder of the current player plus one 
+        /// divided by 2. 
+        /// For example, player = 1. Player + 1 = 2. 2 % 2 = 0. New player = 0.
+        /// player = 0. player + 1 = 1. 1 % 2 = 1. New player = 1.
+        /// 
+        /// This in my opinion is cleaner then checking and switching
+        /// 
+        /// The function will then swap the picbox image to show that it is the next player's move
+        /// 
+        /// </summary>
         private void SwapPlayer()
         {
             // Swap to next player's turn
             player = (player + 1) % 2;
 
+            // TODO: Possibly swap the icon to indicate which player's turn it is. Not essential.
             // Swap arrow img for next player move
             if (player == 0) { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "left.PNG"; }
             else { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "right.PNG"; }
         }
 
+        /// <summary>
+        /// 
+        /// Check whether the game is over by seeing if all of the tiles are taken by the players.
+        /// 
+        /// </summary>
         private void CheckGameOver()
         {
             // Check game over, 8x8 grid = 64 tiles, if all are filled, game is over
@@ -227,18 +248,35 @@ namespace Assignment1
             }
         }
 
+        /// <summary>
+        ///     GetValidTiles iterates through the gameBoard and checks each position for its value.
+        ///     If the value of the position is an empty square, then check if it is a valid tile for all of the offsets
+        ///     If the tile is valid, add it's position to a list of Points and return.
+        /// </summary>
+        /// <returns>
+        ///     A list of Points which are valid tiles that the player is able to press on
+        /// </returns>
         private List<Point> GetValidTiles()
         {
+            // Initialise the list of points, this will be returned at the end
             List<Point> validTiles = new List<Point>();
+
+            // Iterate through the rows
             for (int i = 0; i < gameBoardData.GetLength(0); i++)
             {
+                // Iterate through the columns
                 for (int j = 0; j < gameBoardData.GetLength(1); j++)
                 {
+                    // Check if the current position is clear
                     if (gameBoardData[i, j] == 10)
                     {
+                        // Iterate through all of the offsets around the current position
                         for (int x = 0; x < offsets.Count; x++)
                         {
-                            var isValid = IsTileValid(i, j, offsets[x], new List<Point>(), 0);
+                            // Check the path for the current position with its corrosponding offset
+                            var isValid = IsTileValid(i, j, offsets[x], new List<Point>());
+
+                            // If the tile is valid, add it to the List of Points
                             if (isValid.Item1.Count > 0 && isValid.Item2)
                             {
                                 validTiles.Add(new Point(i, j));
@@ -247,87 +285,134 @@ namespace Assignment1
                     }
                 }
             }
+            // TODO: This might be able to be moved to where the tile is added to the list of points, negating the need for an extra loop
+            // Iterate through all of the valid tiles and set the tile as an available tile visually
+            // This is the normal clear tile with a black square border showing it is available
             for (int y = 0; y < validTiles.Count; y++)
             {
                 _gameBoardGui.SetTile(validTiles[y].X, validTiles[y].Y, "Available");
             }
+
             return validTiles;
         }
-        private (List<Point>, bool) IsTileValid(int offsetRow, int offsetCol, Point currentOffset, List<Point> visitedTiles, int iterations)
+
+        /// <summary>
+        ///     Checks if the current tile is valid by checking through the tiles offsets, this will be predetermined before
+        ///     the check. If the current tile is valid, it will go through recursion in the same function until it meets a tile
+        ///     that is either out of range, or clear, at which point we know that the path is invalid. On the other hand,
+        ///     if the tile met is taken by the player, we know the path that it has taken is valid, therefore the path is then 
+        ///     returned.
+        /// </summary>
+        /// <param name="offsetRow">This is the current row pos being checked</param>
+        /// <param name="offsetCol">This is the current col pos being checked</param>
+        /// <param name="currentOffset">This is the current offset indicating the direction the of the path. This is needed for
+        ///                             the recursion. </param>
+        /// <param name="visitedTiles">This is all of the tiles that have been visited and checked, if the path is eventually
+        ///                            valid, this List will be returned</param>
+        /// <returns>A list of valid tiles and a boolean to say whether the path is valid or not</returns>
+        private (List<Point>, bool) IsTileValid(int currentRow, int currentCol, Point currentOffset, List<Point> visitedTiles)
         {
-            offsetRow += currentOffset.X;
-            offsetCol += currentOffset.Y;
+            // Separate the offset Point into separate variables for readability
+            currentRow += currentOffset.X;
+            currentCol += currentOffset.Y;
 
-            // Is the value out of range?
-            if (offsetRow < 0 || offsetCol < 0 || offsetRow >= 8 || offsetCol >= 8)
+            // Check if the value is out of range, if so then return that the tile is false
+            if (currentRow < 0 || currentCol < 0 || currentRow >= 8 || currentCol >= 8)
             {
                 return (new List<Point>(), false);
             }
 
-            // Is the offset value empty?
-            if (gameBoardData[offsetRow, offsetCol] == 10)
+            // Check if the current offset is a clear tile, if so then retrace the recursion
+            if (gameBoardData[currentRow, currentCol] == 10)
             {
                 return (new List<Point>(), false);
             }
-            // Is the offset value the player?
-            if (gameBoardData[offsetRow, offsetCol] != player)
+
+            // Check if the current offset tile is taken by the opposing player, if so then add the tile to the list and start recursion
+            if (gameBoardData[currentRow, currentCol] != player)
             {
                 // Add the tile to the visited tile array to be changed if the path is valid
-                visitedTiles.Add(new Point(offsetRow, offsetCol));
-                var valid = IsTileValid(offsetRow, offsetCol, currentOffset, visitedTiles, iterations++);
+                visitedTiles.Add(new Point(currentRow, currentCol));
+
+                // Check the next offset to see if its valid
+                var valid = IsTileValid(currentRow, currentCol, currentOffset, visitedTiles);
+
                 return (valid.Item1, true);
             }
 
+            // If the current tile is taken by the player, the path is not valid
             return (visitedTiles, false);
         }
 
-        private void updateTiles(int moves, int offsetRow, int offsetCol, int iterations, List<Point> visitedTiles)
-        {
-            // Update the visited tiles, this will be the tiles between the clicked tile and the end tile
-            if (moves > 0 && gameBoardData[offsetRow, offsetCol] != 10 && iterations == 0)
-            {
-                for (int i = 0; i < visitedTiles.Count(); i++)
-                {
-                    gameBoardData[visitedTiles[i].X, visitedTiles[i].Y] = player;
-                    _gameBoardGui.SetTile(visitedTiles[i].X, visitedTiles[i].Y, player.ToString());
-                    updatePlayerTotals(1, 1);
-                }
-            }
-        }
-
+        /// <summary>
+        ///     Updates the retrospective total tiles for each player.
+        ///     This will be showcased on the screen and also used to check whether the game is over.
+        /// </summary>
+        /// <param name="valueToAdd">The value to add to the current player's total</param>
+        /// <param name="valueToRemove">The value to remove from the opposing player's total</param>
         private void updatePlayerTotals(int valueToAdd, int valueToRemove)
         {
+            // Check if it is player 1
             if (player == 0)
             {
                 whiteTiles += valueToAdd;
                 blackTiles -= valueToRemove;
             }
+            // Otherwise it must be player 2
             else
             {
                 blackTiles += valueToAdd;
                 whiteTiles -= valueToRemove;
             }
+
+            // Update the display text for the totals of each player
             lblP1Val.Text = whiteTiles.ToString() + " x";
             lblP2Val.Text = blackTiles.ToString() + " x";
 
         }
 
+        /// <summary>
+        ///     Event handler for the text box of player 1 entering their name. 
+        ///     Function sets the boolean for the player entering their name as true, this boolean will
+        ///     then be later used for preventing the user from being able to enter text to change their name.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
             p1NameEntered = true;
         }
 
+        /// <summary>
+        ///     Event handler for the text box of player 2 entering their name. 
+        ///     Function sets the boolean for the player entering their name as true, this boolean will
+        ///     then be later used for preventing the user from being able to enter text to change their name.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void txtBoxP2Name_TextChanged(object sender, EventArgs e)
         {
             p2NameEntered = true;
         }
 
-        // Pressing new game button
+        // TODO: Make a new function containing the code from the newGame event handler for reseting the game
+        // as this function will need to be reused for when the game is ended and the player is prompted to
+        // start a new game
+
+        /// <summary>
+        ///     Event handler for when the player presses to start a new game. It will warn the player for data loss and
+        ///     then reset the board 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void newGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Prompt the user that they will lose unsaved data if they continue
             DialogResult choice = MessageBox.Show("Warning, any unsaved progress will be lost.\nContinue?", "New Game", MessageBoxButtons.YesNo);
+            // Check if the user presses to continue
             if (choice == DialogResult.Yes)
             {
+                // Create a reset the back to default values
                 int[,] gameData = MakeBoardArray();
                 for (int i = 0; i < gameBoardData.GetLength(0); i++)
                 {
@@ -337,19 +422,37 @@ namespace Assignment1
                         gameBoardData[i, j] = gameData[i, j];
                     }
                 }
+
+                // Fetch all of the current valid tiles to be displayed
                 GetValidTiles();
             }
         }
 
+        /// <summary>
+        ///     Event handler for when the player presses to save the current game.
+        ///     Checks there is not too many saves and whether the current save name is already taken.
+        ///     If so, prompt to overwrite. Otherwise, save to new save slot.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Initialise boolean for whether the save name currently exists. 
             bool nameExists = false;
+
+            // Check how many saveGame objects there as there can only be 5 save slots in the requirements
             if (saveGames.Count < 5)
             {
                 // TODO: Create a new default string to place in the input box that will be unique. I.E. Date&Time
+
+                // Display a message box for the player to choose the name of their save game
                 string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save game");
+
+                // If the player presses the cancel button, this will return false, otherwise it will continue with
+                // the default value from the input box
                 if (!String.IsNullOrEmpty(saveName))
                 {
+                    // Iterate through all of the current saveGame objects, and check if the current saveName is taken
                     for (int i = 0; i < saveGames.Count; i++)
                     {
                         if (saveGames[i].saveName == saveName)
@@ -357,14 +460,21 @@ namespace Assignment1
                             nameExists = true;
                         }
                     }
+
+                    // If the current save name exists, prompt the user to overwrite the save
                     if (nameExists) 
                     {
                         DialogResult choice = MessageBox.Show("Warning, game name already exists.\nOverwrite??", "Game Exists", MessageBoxButtons.YesNo);
                         if (choice == DialogResult.Yes) { OverwriteSave(saveName); }
                     }
-                    if (!nameExists)
+
+                    // If the save name doesn't exist, save the game to a new slot
+                    else
                     {
+                        // Create a jagged array as 2d arrays cannot be serialised using this serialiser
                         int[][] gameData = new int[8][];
+
+                        // Copy the data from gameboard data to the new jagged array
                         for (int i = 0; i < gameBoardData.GetLength(0); i++)
                         {
                             gameData[i] = new int[8];
@@ -373,14 +483,25 @@ namespace Assignment1
                                 gameData[i][j] = gameBoardData[i, j];
                             }
                         }
+                        
+                        // Create a new SaveGame object with the new data 
                         SaveGame newSave = new SaveGame(saveName, txtBoxP1Name.Text, txtBoxP2Name.Text, gameData, player);
+
+                        // Serialise and append this data to the save game file
                         File.AppendAllText(saveDataDirPath, newSave.Serialise() + "\n");
                     }
                 }
             }
+
+            // Load the save games to the menu
             GetSaveGames();
         }
 
+        /// <summary>
+        ///         Rewrites all of the saves in the save file with the new data. 
+        ///         Deletes all data in the save game file and rewrite all data with changes.
+        /// </summary>
+        /// <param name="saveName">The name of the save to overwrite</param>
         private void OverwriteSave(string saveName)
         {
             // Delete the initial file
@@ -409,7 +530,11 @@ namespace Assignment1
             // Load all of the new save games back to the menu
             GetSaveGames();
         }
-
+        /// <summary>
+        ///         Loads all of the save games onto the menu.
+        ///         If a save file doesn't currently exist, create one.
+        /// </summary>
+        /// <returns>The amount of save games that are being used</returns>
         private int GetSaveGames()
         {
             // Error check for if the file doesn't exist in the folder, could be due to accidental deletion by user
@@ -447,6 +572,11 @@ namespace Assignment1
             return saveData.Length;
         }
 
+        /// <summary>
+        ///         Loads the game at the index which shares a saveName with the sender.ToString().
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LoadGame(object sender, EventArgs e)
         {
             // Initialising a default value for indexToLoad, if not changed, the game will not be loaded
