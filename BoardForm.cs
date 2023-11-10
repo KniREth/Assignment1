@@ -61,8 +61,8 @@ namespace Assignment1
 
             Point top = new Point(10, 30);
             Point bottom = new Point(10, 65);
-
             gameBoardData = this.MakeBoardArray();
+
 
             try
             {
@@ -80,6 +80,11 @@ namespace Assignment1
 
 
         }
+
+        /// <summary>
+        ///         Creates an array with default map values. All squares will be clear other than the middle 4.
+        /// </summary>
+        /// <returns></returns>
         private int[,] MakeBoardArray()
         {
             // Create a new 2d board array and set the length to the number of rows and cols in the board
@@ -105,11 +110,19 @@ namespace Assignment1
 
                     // Update the array at the current position to the corrosponding value as found above
                     boardArray[row, col] = boardVal;
+
+                    if (_gameBoardGui != null)
+                    {
+                        _gameBoardGui.SetTile(row, col, boardVal.ToString());
+                    }
                 }
             }
 
             return boardArray;
         }
+
+        // TODO: Possibly break down GameTileClicked into more functions for readability. This function is quite packed atm
+        // Such as creating a CheckPath function maybe?
 
         /// <summary>
         ///         When the player clicks on the tile, it checks if the current tile is valid and then
@@ -187,6 +200,7 @@ namespace Assignment1
             }
 
             // TODO: See if the below loop can be placed into the top of the GetValidTiles function to help clear up this funciton
+
             // Clear valid tiles so that they can be reset 
             for (int y = 0; y < validTiles.Count; y++)
             {
@@ -426,22 +440,13 @@ namespace Assignment1
             }
         }
 
-
         /// <summary>
         ///         Resets all of the maps values to the base values so that the players can start again.
         /// </summary>
         private void ResetMap()
         {
-            // Create a reset the back to default values
-            int[,] gameData = MakeBoardArray();
-            for (int i = 0; i < gameBoardData.GetLength(0); i++)
-            {
-                for (int j = 0; j < gameBoardData.GetLength(1); j++)
-                {
-                    _gameBoardGui.SetTile(i, j, gameData[i, j].ToString());
-                    gameBoardData[i, j] = gameData[i, j];
-                }
-            }
+            // Reset board data
+            gameBoardData = MakeBoardArray();
 
             // Fetch all of the current valid tiles to be displayed
             GetValidTiles();
@@ -633,6 +638,9 @@ namespace Assignment1
             }
         }
 
+        /// <summary>
+        ///         Looks through the game array to see how many tiles each player currently has
+        /// </summary>
         private void GetPlayerTotals()
         {
             whiteTiles = 0;
