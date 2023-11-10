@@ -31,9 +31,6 @@ namespace Assignment1
         // All of the SaveGame objects which have been deserialised from the SaveGame.JSON file
         List<SaveGame> saveGames = new List<SaveGame>();
 
-        // Check if the game is over
-        bool isGameOver = false;
-
         // Valid tiles for each player
         List<Point> validTiles = new List<Point>();
 
@@ -178,21 +175,14 @@ namespace Assignment1
                 }
             }
 
-            // Check to see if the game has ended
-            CheckGameOver();
-
-            // TODO: Place the check "stalemate" into its own function
-            // TODO: Create a function to prompt the user to start a new game when the current game is over
-            // If the player has no tiles left to choose from, but the game isn't over, switch players
-            if (GetValidTiles().Count <= 0 && !isGameOver)
+            if (CheckGameOver() || CheckStalemate())
             {
-                MessageBox.Show("No valid tiles, swapping player");
-                SwapPlayer();
-
-                // If the other player is in the same situation, the game is ended
-                if (GetValidTiles().Count <= 0)
+                // Prompt the user that they will lose unsaved data if they continue
+                DialogResult choice = MessageBox.Show("Start a new game?", "New Game", MessageBoxButtons.YesNo);
+                // Check if the user presses to continue
+                if (choice == DialogResult.Yes)
                 {
-                    MessageBox.Show("No more valid tiles for either players.");
+                    ResetMap();
                 }
             }
 
@@ -204,12 +194,33 @@ namespace Assignment1
                 {
                     _gameBoardGui.SetTile(validTiles[y].X, validTiles[y].Y, "10");
                 }
-
             }
 
             // Get all of the valid tiles for the player
             validTiles = GetValidTiles();
 
+        }
+
+        /// <summary>
+        ///         Checks if the current player has no moves, if so swap player and check the other player. 
+        ///         If the other player has no moves, game is stalemate
+        /// </summary>
+        private bool CheckStalemate()
+        {
+            // If the player has no tiles left to choose from, but the game isn't over, switch players
+            if (GetValidTiles().Count <= 0 && !CheckGameOver())
+            {
+                MessageBox.Show("No valid tiles, swapping player");
+                SwapPlayer();
+
+                // If the other player is in the same situation, the game is ended
+                if (GetValidTiles().Count <= 0)
+                {
+                    MessageBox.Show("No more valid tiles for either players.");
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -240,7 +251,7 @@ namespace Assignment1
         /// Check whether the game is over by seeing if all of the tiles are taken by the players.
         /// 
         /// </summary>
-        private void CheckGameOver()
+        private bool CheckGameOver()
         {
             // Check game over, 8x8 grid = 64 tiles, if all are filled, game is over
             if (blackTiles + whiteTiles >= 64)
@@ -251,8 +262,9 @@ namespace Assignment1
                     MessageBox.Show("Game over, White wins!");
                 }
                 else { MessageBox.Show("Game over, Black wins!"); }
-                isGameOver = true;
+                return true;
             }
+            return false;
         }
 
         /// <summary>
@@ -287,17 +299,11 @@ namespace Assignment1
                             if (isValid.Item1.Count > 0 && isValid.Item2)
                             {
                                 validTiles.Add(new Point(i, j));
+                                _gameBoardGui.SetTile(i, j, "Available");
                             }
                         }
                     }
                 }
-            }
-            // TODO: This might be able to be moved to where the tile is added to the list of points, negating the need for an extra loop
-            // Iterate through all of the valid tiles and set the tile as an available tile visually
-            // This is the normal clear tile with a black square border showing it is available
-            for (int y = 0; y < validTiles.Count; y++)
-            {
-                _gameBoardGui.SetTile(validTiles[y].X, validTiles[y].Y, "Available");
             }
 
             return validTiles;
@@ -402,9 +408,6 @@ namespace Assignment1
             p2NameEntered = true;
         }
 
-        // TODO: Make a new function containing the code from the newGame event handler for reseting the game
-        // as this function will need to be reused for when the game is ended and the player is prompted to
-        // start a new game
 
         /// <summary>
         ///     Event handler for when the player presses to start a new game. It will warn the player for data loss and
@@ -419,23 +422,32 @@ namespace Assignment1
             // Check if the user presses to continue
             if (choice == DialogResult.Yes)
             {
-                // Create a reset the back to default values
-                int[,] gameData = MakeBoardArray();
-                for (int i = 0; i < gameBoardData.GetLength(0); i++)
-                {
-                    for (int j = 0; j < gameBoardData.GetLength(1); j++)
-                    {
-                        _gameBoardGui.SetTile(i, j, gameData[i, j].ToString());
-                        gameBoardData[i, j] = gameData[i, j];
-                    }
-                }
-
-                // Fetch all of the current valid tiles to be displayed
-                GetValidTiles();
-
-                // Get player totals to load to screen
-                GetPlayerTotals();
+                ResetMap();
             }
+        }
+
+
+        /// <summary>
+        ///         Resets all of the maps values to the base values so that the players can start again.
+        /// </summary>
+        private void ResetMap()
+        {
+            // Create a reset the back to default values
+            int[,] gameData = MakeBoardArray();
+            for (int i = 0; i < gameBoardData.GetLength(0); i++)
+            {
+                for (int j = 0; j < gameBoardData.GetLength(1); j++)
+                {
+                    _gameBoardGui.SetTile(i, j, gameData[i, j].ToString());
+                    gameBoardData[i, j] = gameData[i, j];
+                }
+            }
+
+            // Fetch all of the current valid tiles to be displayed
+            GetValidTiles();
+
+            // Get player totals to load to screen
+            GetPlayerTotals();
         }
 
         /// <summary>
@@ -453,8 +465,6 @@ namespace Assignment1
             // Check how many saveGame objects there as there can only be 5 save slots in the requirements
             if (saveGames.Count < 5)
             {
-                // TODO: Create a new default string to place in the input box that will be unique. I.E. Date&Time
-
                 // The default name for the save game, this ensures it will be unique everytime
                 string defaultSaveName = DateTime.Now.ToString();
 
@@ -547,8 +557,7 @@ namespace Assignment1
         ///         Loads all of the save games onto the menu.
         ///         If a save file doesn't currently exist, create one.
         /// </summary>
-        /// <returns>The amount of save games that are being used</returns>
-        private int GetSaveGames()
+        private void GetSaveGames()
         {
             // Error check for if the file doesn't exist in the folder, could be due to accidental deletion by user
             if (!File.Exists(saveDataDirPath))
@@ -578,11 +587,6 @@ namespace Assignment1
                 // Event handler for the new drop down item, when clicked, LoadGame function will run
                 loadGameToolStripMenuItem.DropDownItems[i].Click += new EventHandler(LoadGame);
             }
-
-            // Return back the amount of items in the array for iteration purposes
-            // TODO: This may not be needed, could possibly instead use saveGames.Count which should have same value but
-            // instead would be a pulic variable which therefore negates the need of a return
-            return saveData.Length;
         }
 
         /// <summary>
