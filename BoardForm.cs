@@ -114,6 +114,13 @@ namespace Assignment1
             return boardArray;
         }
 
+        /// <summary>
+        ///         When the player clicks on the tile, it checks if the current tile is valid and then
+        ///         swaps all of the necessary tiles to the correct colour and updates the player totals.
+        ///         It will then switch to the next player's turn.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void GameTileClicked(object sender, EventArgs e)
         {
             // Flag to check whether values need to be updated
@@ -425,6 +432,9 @@ namespace Assignment1
 
                 // Fetch all of the current valid tiles to be displayed
                 GetValidTiles();
+
+                // Get player totals to load to screen
+                GetPlayerTotals();
             }
         }
 
@@ -445,8 +455,11 @@ namespace Assignment1
             {
                 // TODO: Create a new default string to place in the input box that will be unique. I.E. Date&Time
 
+                // The default name for the save game, this ensures it will be unique everytime
+                string defaultSaveName = DateTime.Now.ToString();
+
                 // Display a message box for the player to choose the name of their save game
-                string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save game");
+                string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save Game", defaultSaveName);
 
                 // If the player presses the cancel button, this will return false, otherwise it will continue with
                 // the default value from the input box
@@ -610,7 +623,34 @@ namespace Assignment1
 
                 // Display all of the current valid tiles to the screen
                 GetValidTiles();
+
+                // Get the player totals to display to screen
+                GetPlayerTotals();
             }
+        }
+
+        private void GetPlayerTotals()
+        {
+            whiteTiles = 0;
+            blackTiles = 0;
+            for (int i = 0; i < gameBoardData.GetLength(0);i++)
+            {
+                for (int j = 0;j < gameBoardData.GetLength(1);j++)
+                {
+                    if (gameBoardData[i,j] == 0)
+                    {
+                        whiteTiles += 1;
+                    }
+                    else if (gameBoardData[i,j] == 1)
+                    {
+                        blackTiles += 1;
+                    }
+                }
+            }
+
+            // Update the display text for the totals of each player
+            lblP1Val.Text = whiteTiles.ToString() + " x";
+            lblP2Val.Text = blackTiles.ToString() + " x";
         }
     }
 }
