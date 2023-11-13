@@ -32,6 +32,7 @@
             gameToolStripMenuItem = new ToolStripMenuItem();
             newGameToolStripMenuItem = new ToolStripMenuItem();
             saveGameToolStripMenuItem = new ToolStripMenuItem();
+            overwriteSaveToolStripMenuItem = new ToolStripMenuItem();
             loadGameToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             speakToolStripMenuItem = new ToolStripMenuItem();
@@ -45,7 +46,6 @@
             picBoxP1Token = new PictureBox();
             picBoxP2Token = new PictureBox();
             picBoxPlayerToMove = new PictureBox();
-            overwriteSaveToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picBoxP1Token).BeginInit();
@@ -84,6 +84,12 @@
             saveGameToolStripMenuItem.Text = "Save Game";
             saveGameToolStripMenuItem.Click += saveGameToolStripMenuItem_Click;
             // 
+            // overwriteSaveToolStripMenuItem
+            // 
+            overwriteSaveToolStripMenuItem.Name = "overwriteSaveToolStripMenuItem";
+            overwriteSaveToolStripMenuItem.Size = new Size(191, 26);
+            overwriteSaveToolStripMenuItem.Text = "Overwrite Save";
+            // 
             // loadGameToolStripMenuItem
             // 
             loadGameToolStripMenuItem.Name = "loadGameToolStripMenuItem";
@@ -101,8 +107,9 @@
             // 
             speakToolStripMenuItem.CheckOnClick = true;
             speakToolStripMenuItem.Name = "speakToolStripMenuItem";
-            speakToolStripMenuItem.Size = new Size(209, 26);
+            speakToolStripMenuItem.Size = new Size(224, 26);
             speakToolStripMenuItem.Text = "Speak";
+            speakToolStripMenuItem.CheckedChanged += speakToolStripMenuItem_CheckedChanged;
             // 
             // informationPanelToolStripMenuItem
             // 
@@ -110,7 +117,7 @@
             informationPanelToolStripMenuItem.CheckOnClick = true;
             informationPanelToolStripMenuItem.CheckState = CheckState.Checked;
             informationPanelToolStripMenuItem.Name = "informationPanelToolStripMenuItem";
-            informationPanelToolStripMenuItem.Size = new Size(209, 26);
+            informationPanelToolStripMenuItem.Size = new Size(224, 26);
             informationPanelToolStripMenuItem.Text = "Information Panel";
             informationPanelToolStripMenuItem.CheckedChanged += informationPanelToolStripMenuItem_CheckedChanged;
             // 
@@ -194,12 +201,6 @@
             picBoxPlayerToMove.Size = new Size(125, 40);
             picBoxPlayerToMove.TabIndex = 8;
             picBoxPlayerToMove.TabStop = false;
-            // 
-            // overwriteSaveToolStripMenuItem
-            // 
-            overwriteSaveToolStripMenuItem.Name = "overwriteSaveToolStripMenuItem";
-            overwriteSaveToolStripMenuItem.Size = new Size(191, 26);
-            overwriteSaveToolStripMenuItem.Text = "Overwrite Save";
             // 
             // BoardForm
             // 
