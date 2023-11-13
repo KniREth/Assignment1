@@ -34,19 +34,21 @@
             saveGameToolStripMenuItem = new ToolStripMenuItem();
             loadGameToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
+            speakToolStripMenuItem = new ToolStripMenuItem();
+            informationPanelToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
             txtBoxP1Name = new TextBox();
             txtBoxP2Name = new TextBox();
             lblP1Val = new Label();
             lblP2Val = new Label();
             pictureBox1 = new PictureBox();
-            pictureBox2 = new PictureBox();
-            pictureBox3 = new PictureBox();
+            picBoxP1Token = new PictureBox();
+            picBoxP2Token = new PictureBox();
             picBoxPlayerToMove = new PictureBox();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)picBoxP1Token).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)picBoxP2Token).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picBoxPlayerToMove).BeginInit();
             SuspendLayout();
             // 
@@ -70,28 +72,46 @@
             // newGameToolStripMenuItem
             // 
             newGameToolStripMenuItem.Name = "newGameToolStripMenuItem";
-            newGameToolStripMenuItem.Size = new Size(224, 26);
+            newGameToolStripMenuItem.Size = new Size(168, 26);
             newGameToolStripMenuItem.Text = "New Game";
             newGameToolStripMenuItem.Click += newGameToolStripMenuItem_Click;
             // 
             // saveGameToolStripMenuItem
             // 
             saveGameToolStripMenuItem.Name = "saveGameToolStripMenuItem";
-            saveGameToolStripMenuItem.Size = new Size(224, 26);
+            saveGameToolStripMenuItem.Size = new Size(168, 26);
             saveGameToolStripMenuItem.Text = "Save Game";
             saveGameToolStripMenuItem.Click += saveGameToolStripMenuItem_Click;
             // 
             // loadGameToolStripMenuItem
             // 
             loadGameToolStripMenuItem.Name = "loadGameToolStripMenuItem";
-            loadGameToolStripMenuItem.Size = new Size(224, 26);
+            loadGameToolStripMenuItem.Size = new Size(168, 26);
             loadGameToolStripMenuItem.Text = "Load Game";
             // 
             // settingsToolStripMenuItem
             // 
+            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { speakToolStripMenuItem, informationPanelToolStripMenuItem });
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new Size(76, 24);
             settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // speakToolStripMenuItem
+            // 
+            speakToolStripMenuItem.CheckOnClick = true;
+            speakToolStripMenuItem.Name = "speakToolStripMenuItem";
+            speakToolStripMenuItem.Size = new Size(209, 26);
+            speakToolStripMenuItem.Text = "Speak";
+            // 
+            // informationPanelToolStripMenuItem
+            // 
+            informationPanelToolStripMenuItem.Checked = true;
+            informationPanelToolStripMenuItem.CheckOnClick = true;
+            informationPanelToolStripMenuItem.CheckState = CheckState.Checked;
+            informationPanelToolStripMenuItem.Name = "informationPanelToolStripMenuItem";
+            informationPanelToolStripMenuItem.Size = new Size(209, 26);
+            informationPanelToolStripMenuItem.Text = "Information Panel";
+            informationPanelToolStripMenuItem.CheckedChanged += informationPanelToolStripMenuItem_CheckedChanged;
             // 
             // helpToolStripMenuItem
             // 
@@ -148,22 +168,22 @@
             pictureBox1.TabIndex = 5;
             pictureBox1.TabStop = false;
             // 
-            // pictureBox2
+            // picBoxP1Token
             // 
-            pictureBox2.Location = new Point(95, 704);
-            pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(40, 40);
-            pictureBox2.TabIndex = 6;
-            pictureBox2.TabStop = false;
+            picBoxP1Token.Location = new Point(95, 704);
+            picBoxP1Token.Name = "picBoxP1Token";
+            picBoxP1Token.Size = new Size(40, 40);
+            picBoxP1Token.TabIndex = 6;
+            picBoxP1Token.TabStop = false;
             // 
-            // pictureBox3
+            // picBoxP2Token
             // 
-            pictureBox3.BackColor = Color.Black;
-            pictureBox3.Location = new Point(563, 704);
-            pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(40, 40);
-            pictureBox3.TabIndex = 7;
-            pictureBox3.TabStop = false;
+            picBoxP2Token.BackColor = Color.Black;
+            picBoxP2Token.Location = new Point(563, 704);
+            picBoxP2Token.Name = "picBoxP2Token";
+            picBoxP2Token.Size = new Size(40, 40);
+            picBoxP2Token.TabIndex = 7;
+            picBoxP2Token.TabStop = false;
             // 
             // picBoxPlayerToMove
             // 
@@ -180,8 +200,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(782, 753);
             Controls.Add(picBoxPlayerToMove);
-            Controls.Add(pictureBox3);
-            Controls.Add(pictureBox2);
+            Controls.Add(picBoxP2Token);
+            Controls.Add(picBoxP1Token);
             Controls.Add(lblP2Val);
             Controls.Add(lblP1Val);
             Controls.Add(txtBoxP2Name);
@@ -199,8 +219,8 @@
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
+            ((System.ComponentModel.ISupportInitialize)picBoxP1Token).EndInit();
+            ((System.ComponentModel.ISupportInitialize)picBoxP2Token).EndInit();
             ((System.ComponentModel.ISupportInitialize)picBoxPlayerToMove).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -217,11 +237,13 @@
         private Label lblP1Val;
         private Label lblP2Val;
         private PictureBox pictureBox1;
-        private PictureBox pictureBox2;
-        private PictureBox pictureBox3;
+        private PictureBox picBoxP1Token;
+        private PictureBox picBoxP2Token;
         private PictureBox picBoxPlayerToMove;
         private ToolStripMenuItem newGameToolStripMenuItem;
         private ToolStripMenuItem saveGameToolStripMenuItem;
         private ToolStripMenuItem loadGameToolStripMenuItem;
+        private ToolStripMenuItem speakToolStripMenuItem;
+        private ToolStripMenuItem informationPanelToolStripMenuItem;
     }
 }

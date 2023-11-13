@@ -168,7 +168,7 @@ namespace Assignment1
                                 gameBoardData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] = player;
 
                                 _gameBoardGui.SetTile(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
-                                updatePlayerTotals(1, 1);
+                                UpdatePlayerTotals(1, 1);
 
                                 moveCheck = true;
                             }
@@ -183,7 +183,7 @@ namespace Assignment1
                 {
                     gameBoardData[selectionRow, selectionCol] = player;
                     _gameBoardGui.SetTile(selectionRow, selectionCol, player.ToString());
-                    updatePlayerTotals(1, 0);
+                    UpdatePlayerTotals(1, 0);
                     SwapPlayer();
                 }
             }
@@ -377,7 +377,7 @@ namespace Assignment1
         /// </summary>
         /// <param name="valueToAdd">The value to add to the current player's total</param>
         /// <param name="valueToRemove">The value to remove from the opposing player's total</param>
-        private void updatePlayerTotals(int valueToAdd, int valueToRemove)
+        private void UpdatePlayerTotals(int valueToAdd, int valueToRemove)
         {
             // Check if it is player 1
             if (player == 0)
@@ -490,7 +490,7 @@ namespace Assignment1
                     }
 
                     // If the current save name exists, prompt the user to overwrite the save
-                    if (nameExists) 
+                    if (nameExists)
                     {
                         DialogResult choice = MessageBox.Show("Warning, game name already exists.\nOverwrite??", "Game Exists", MessageBoxButtons.YesNo);
                         if (choice == DialogResult.Yes) { OverwriteSave(saveName); }
@@ -511,7 +511,7 @@ namespace Assignment1
                                 gameData[i][j] = gameBoardData[i, j];
                             }
                         }
-                        
+
                         // Create a new SaveGame object with the new data 
                         SaveGame newSave = new SaveGame(saveName, txtBoxP1Name.Text, txtBoxP2Name.Text, gameData, player);
 
@@ -544,9 +544,9 @@ namespace Assignment1
                     saveGames[i].player1Name = txtBoxP1Name.Text;
                     saveGames[i].player2Name = txtBoxP2Name.Text;
                     saveGames[i].playerTurn = player;
-                    for (int j = 0;j < gameBoardData.GetLength(0); j++)
+                    for (int j = 0; j < gameBoardData.GetLength(0); j++)
                     {
-                        for (int x = 0; x < gameBoardData.GetLength(1);  x++)
+                        for (int x = 0; x < gameBoardData.GetLength(1); x++)
                         {
                             saveGames[i].gameData[j][x] = gameBoardData[j, x];
                         }
@@ -616,7 +616,7 @@ namespace Assignment1
                     break;
                 }
             }
-            
+
             // Check if the index is valid
             if (indexToLoad >= 0)
             {
@@ -626,7 +626,7 @@ namespace Assignment1
                     for (int j = 0; j < gameBoardData.GetLength(1); j++)
                     {
                         gameBoardData[i, j] = saveGames[indexToLoad].gameData[i][j];
-                        _gameBoardGui.SetTile(i, j, gameBoardData[i,j].ToString());
+                        _gameBoardGui.SetTile(i, j, gameBoardData[i, j].ToString());
                     }
                 }
 
@@ -645,15 +645,15 @@ namespace Assignment1
         {
             whiteTiles = 0;
             blackTiles = 0;
-            for (int i = 0; i < gameBoardData.GetLength(0);i++)
+            for (int i = 0; i < gameBoardData.GetLength(0); i++)
             {
-                for (int j = 0;j < gameBoardData.GetLength(1);j++)
+                for (int j = 0; j < gameBoardData.GetLength(1); j++)
                 {
-                    if (gameBoardData[i,j] == 0)
+                    if (gameBoardData[i, j] == 0)
                     {
                         whiteTiles += 1;
                     }
-                    else if (gameBoardData[i,j] == 1)
+                    else if (gameBoardData[i, j] == 1)
                     {
                         blackTiles += 1;
                     }
@@ -663,6 +663,27 @@ namespace Assignment1
             // Update the display text for the totals of each player
             lblP1Val.Text = whiteTiles.ToString() + " x";
             lblP2Val.Text = blackTiles.ToString() + " x";
+        }
+
+        /// <summary>
+        ///     Make the information panel visible or not when the player checks/unchecks the button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void informationPanelToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            // Initialise the bool as the value of the information panel check button to change visibility to
+            bool isChecked = informationPanelToolStripMenuItem.Checked;
+            
+            // Change visibility of information panel items
+            lblP1Val.Visible = isChecked;
+            lblP2Val.Visible = isChecked;
+            picBoxP1Token.Visible = isChecked;
+            picBoxP2Token.Visible = isChecked;
+            txtBoxP1Name.Visible = isChecked;
+            txtBoxP2Name.Visible = isChecked;
+            picBoxPlayerToMove.Visible = isChecked;
+            
         }
     }
 }
