@@ -790,6 +790,10 @@ namespace Assignment1
             // Check if the index is valid
             if (indexToLoad >= 0)
             {
+                // Load the player names and player turn
+                txtBoxP1Name.Text = saveGames[indexToLoad].player1Name;
+                txtBoxP2Name.Text = saveGames[indexToLoad].player2Name;
+                if (saveGames[indexToLoad].playerTurn != player) { SwapPlayer(); }
                 // Iterate through the game board and change the tiles to game to load's tiles
                 for (int i = 0; i < gameBoardData.GetLength(0); i++)
                 {
