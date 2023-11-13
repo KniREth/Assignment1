@@ -681,24 +681,39 @@ namespace Assignment1
             // Each line in the file will be a separate index in the array
             string[] saveData = File.ReadAllLines(saveDataDirPath);
 
-            // Iterate through the string array, hence iterate through the data in the file
-            for (int i = 0; i < saveData.Length; i++)
+            // Check if there are any save games
+            if (saveData.Length > 0)
             {
-                // Serialise each line in the array into a Object and add objects intoa list of objects
-                saveGames.Add(JsonSerializer.Deserialize<SaveGame>(saveData[i]));
+                // Ensure that the player can see the load and save games
+                loadGameToolStripMenuItem.Visible = true; 
+                overwriteSaveToolStripMenuItem.Visible = true;
 
-                // Create a new drop down item for the load game drop down and Overwrite save and insert it
-                ToolStripMenuItem newItem = new ToolStripMenuItem { Name = "New save " + i.ToString(), Text = saveGames[i].saveName };
-                loadGameToolStripMenuItem.DropDownItems.Insert(i, newItem);
+                // Iterate through the string array, hence iterate through the data in the file
+                for (int i = 0; i < saveData.Length; i++)
+                {
+                    // Serialise each line in the array into a Object and add objects intoa list of objects
+                    saveGames.Add(JsonSerializer.Deserialize<SaveGame>(saveData[i]));
 
-                ToolStripMenuItem newOverwrite = new ToolStripMenuItem { Name = "Overwrite Save" + i.ToString(), Text = saveGames[i].saveName };
-                overwriteSaveToolStripMenuItem.DropDownItems.Insert(i, newOverwrite);
+                    // Create a new drop down item for the load game drop down and Overwrite save and insert it
+                    ToolStripMenuItem newItem = new ToolStripMenuItem { Name = "New save " + i.ToString(), Text = saveGames[i].saveName };
+                    loadGameToolStripMenuItem.DropDownItems.Insert(i, newItem);
 
-                // Event handler for the new drop down item, when clicked, LoadGame function will run
-                loadGameToolStripMenuItem.DropDownItems[i].Click += new EventHandler(LoadGame);
+                    ToolStripMenuItem newOverwrite = new ToolStripMenuItem { Name = "Overwrite Save" + i.ToString(), Text = saveGames[i].saveName };
+                    overwriteSaveToolStripMenuItem.DropDownItems.Insert(i, newOverwrite);
 
-                // Event handler for overwrite save game
-                overwriteSaveToolStripMenuItem.DropDownItems[i].Click += new EventHandler(HandlerOverwriteSave);
+                    // Event handler for the new drop down item, when clicked, LoadGame function will run
+                    loadGameToolStripMenuItem.DropDownItems[i].Click += new EventHandler(LoadGame);
+
+                    // Event handler for overwrite save game
+                    overwriteSaveToolStripMenuItem.DropDownItems[i].Click += new EventHandler(HandlerOverwriteSave);
+                }
+            }
+
+            // Make the load game and overwrite save buttons not visible as they are not needed
+            else 
+            { 
+                loadGameToolStripMenuItem.Visible = false; 
+                overwriteSaveToolStripMenuItem.Visible = false;
             }
         }
 
