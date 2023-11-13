@@ -75,14 +75,14 @@
             newGameToolStripMenuItem.Name = "newGameToolStripMenuItem";
             newGameToolStripMenuItem.Size = new Size(191, 26);
             newGameToolStripMenuItem.Text = "New Game";
-            newGameToolStripMenuItem.Click += newGameToolStripMenuItem_Click;
+            newGameToolStripMenuItem.Click += NewGameToolStripMenuItem_Click;
             // 
             // saveGameToolStripMenuItem
             // 
             saveGameToolStripMenuItem.Name = "saveGameToolStripMenuItem";
             saveGameToolStripMenuItem.Size = new Size(191, 26);
             saveGameToolStripMenuItem.Text = "Save Game";
-            saveGameToolStripMenuItem.Click += saveGameToolStripMenuItem_Click;
+            saveGameToolStripMenuItem.Click += SaveGameToolStripMenuItem_Click;
             // 
             // overwriteSaveToolStripMenuItem
             // 
@@ -107,9 +107,9 @@
             // 
             speakToolStripMenuItem.CheckOnClick = true;
             speakToolStripMenuItem.Name = "speakToolStripMenuItem";
-            speakToolStripMenuItem.Size = new Size(224, 26);
+            speakToolStripMenuItem.Size = new Size(209, 26);
             speakToolStripMenuItem.Text = "Speak";
-            speakToolStripMenuItem.CheckedChanged += speakToolStripMenuItem_CheckedChanged;
+            speakToolStripMenuItem.CheckedChanged += SpeakToolStripMenuItem_CheckedChanged;
             // 
             // informationPanelToolStripMenuItem
             // 
@@ -117,9 +117,9 @@
             informationPanelToolStripMenuItem.CheckOnClick = true;
             informationPanelToolStripMenuItem.CheckState = CheckState.Checked;
             informationPanelToolStripMenuItem.Name = "informationPanelToolStripMenuItem";
-            informationPanelToolStripMenuItem.Size = new Size(224, 26);
+            informationPanelToolStripMenuItem.Size = new Size(209, 26);
             informationPanelToolStripMenuItem.Text = "Information Panel";
-            informationPanelToolStripMenuItem.CheckedChanged += informationPanelToolStripMenuItem_CheckedChanged;
+            informationPanelToolStripMenuItem.CheckedChanged += InformationPanelToolStripMenuItem_CheckedChanged;
             // 
             // helpToolStripMenuItem
             // 
@@ -134,7 +134,7 @@
             txtBoxP1Name.PlaceholderText = "Enter name";
             txtBoxP1Name.Size = new Size(125, 27);
             txtBoxP1Name.TabIndex = 1;
-            txtBoxP1Name.TextChanged += textBox1_TextChanged;
+            txtBoxP1Name.TextChanged += TxtBoxP1Name_TextChanged;
             // 
             // txtBoxP2Name
             // 
@@ -143,7 +143,7 @@
             txtBoxP2Name.PlaceholderText = "Enter name";
             txtBoxP2Name.Size = new Size(125, 27);
             txtBoxP2Name.TabIndex = 2;
-            txtBoxP2Name.TextChanged += txtBoxP2Name_TextChanged;
+            txtBoxP2Name.TextChanged += TxtBoxP2Name_TextChanged;
             // 
             // lblP1Val
             // 
@@ -223,7 +223,7 @@
             MinimumSize = new Size(800, 800);
             Name = "BoardForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "O'Spookio";
+            Text = "O'Neillo Game";
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();

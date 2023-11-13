@@ -217,7 +217,7 @@ namespace Assignment1
                     if (speakToolStripMenuItem.Checked)
                     {
                         // Add 1 to each due to 0 indexing
-                        speechSynth.Speak("Player" + (player + 1).ToString() + " has placed a token at " + (selectionRow  + 1).ToString() + " " + (selectionCol + 1).ToString());
+                        speechSynth.Speak("Player" + (player + 1).ToString() + " has placed a token at " + (selectionRow + 1).ToString() + " " + (selectionCol + 1).ToString());
                     }
                     SwapPlayer();
                 }
@@ -339,7 +339,7 @@ namespace Assignment1
 
                     MessageBox.Show("Game over, White wins!");
                 }
-                else 
+                else
                 {
                     // Speech if required
                     if (speakToolStripMenuItem.Checked)
@@ -478,7 +478,7 @@ namespace Assignment1
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void TxtBoxP1Name_TextChanged(object sender, EventArgs e)
         {
             p1NameEntered = true;
         }
@@ -490,7 +490,7 @@ namespace Assignment1
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void txtBoxP2Name_TextChanged(object sender, EventArgs e)
+        private void TxtBoxP2Name_TextChanged(object sender, EventArgs e)
         {
             p2NameEntered = true;
         }
@@ -501,14 +501,14 @@ namespace Assignment1
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void newGameToolStripMenuItem_Click(object sender, EventArgs e)
+        private void NewGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Speech if required
             if (speakToolStripMenuItem.Checked)
             {
                 speechSynth.Speak("Warning, any unsaved progress will be lost. Do you want to continue?");
             }
-            
+
             // Prompt the user that they will lose unsaved data if they continue
             DialogResult choice = MessageBox.Show("Warning, any unsaved progress will be lost.\nContinue?", "New Game", MessageBoxButtons.YesNo);
 
@@ -545,7 +545,7 @@ namespace Assignment1
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void saveGameToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Initialise boolean for whether the save name currently exists. 
             bool nameExists = false;
@@ -614,8 +614,8 @@ namespace Assignment1
                     }
                 }
             }
-            else 
-            { 
+            else
+            {
                 // Speech if required
                 if (speakToolStripMenuItem.Checked)
                 {
@@ -689,7 +689,7 @@ namespace Assignment1
             if (saveData.Length > 0)
             {
                 // Ensure that the player can see the load and save games
-                loadGameToolStripMenuItem.Visible = true; 
+                loadGameToolStripMenuItem.Visible = true;
                 overwriteSaveToolStripMenuItem.Visible = true;
 
                 // Iterate through the string array, hence iterate through the data in the file
@@ -714,9 +714,9 @@ namespace Assignment1
             }
 
             // Make the load game and overwrite save buttons not visible as they are not needed
-            else 
-            { 
-                loadGameToolStripMenuItem.Visible = false; 
+            else
+            {
+                loadGameToolStripMenuItem.Visible = false;
                 overwriteSaveToolStripMenuItem.Visible = false;
             }
         }
@@ -848,7 +848,7 @@ namespace Assignment1
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void informationPanelToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        private void InformationPanelToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
             // Initialise the bool as the value of the information panel check button to change visibility to
             bool isChecked = informationPanelToolStripMenuItem.Checked;
@@ -863,15 +863,15 @@ namespace Assignment1
             picBoxPlayerToMove.Visible = isChecked;
 
         }
-    
+
         /// <summary>
         ///         When the player presses the speak button, it will tell the player whether they have turned speech synthesis on or off
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void speakToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        private void SpeakToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
         {
-            if (speakToolStripMenuItem.Checked) 
+            if (speakToolStripMenuItem.Checked)
             {
                 speechSynth.Speak("Speech synthesis turned on.");
             }
