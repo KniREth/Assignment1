@@ -422,7 +422,6 @@ namespace Assignment1
             p2NameEntered = true;
         }
 
-
         /// <summary>
         ///     Event handler for when the player presses to start a new game. It will warn the player for data loss and
         ///     then reset the board 
@@ -493,7 +492,7 @@ namespace Assignment1
                     if (nameExists)
                     {
                         DialogResult choice = MessageBox.Show("Warning, game name already exists.\nOverwrite??", "Game Exists", MessageBoxButtons.YesNo);
-                        if (choice == DialogResult.Yes) { OverwriteSave(saveName); }
+                        if (choice == DialogResult.Yes) { OverwriteSave(saveName, saveName); }
                     }
 
                     // If the save name doesn't exist, save the game to a new slot
@@ -520,6 +519,7 @@ namespace Assignment1
                     }
                 }
             }
+            else { MessageBox.Show("You can only have 5 save game slots, choose a game to overwrite"); }
 
             // Load the save games to the menu
             GetSaveGames();
@@ -530,7 +530,7 @@ namespace Assignment1
         ///         Deletes all data in the save game file and rewrite all data with changes.
         /// </summary>
         /// <param name="saveName">The name of the save to overwrite</param>
-        private void OverwriteSave(string saveName)
+        private void OverwriteSave(string saveName, string newSaveName)
         {
             // Delete the initial file
             File.Delete(saveDataDirPath);
@@ -541,6 +541,7 @@ namespace Assignment1
                 // If the saveGame object's saveName is the same as the param, overwrite that object
                 if (saveGames[i].saveName == saveName)
                 {
+                    //saveGames[i].saveName = newSaveName;
                     saveGames[i].player1Name = txtBoxP1Name.Text;
                     saveGames[i].player2Name = txtBoxP2Name.Text;
                     saveGames[i].playerTurn = player;
@@ -558,6 +559,7 @@ namespace Assignment1
             // Load all of the new save games back to the menu
             GetSaveGames();
         }
+
         /// <summary>
         ///         Loads all of the save games onto the menu.
         ///         If a save file doesn't currently exist, create one.
@@ -574,6 +576,7 @@ namespace Assignment1
             // Clear the list of SaveGame objects from the list and clear the menu drop down items
             saveGames.Clear();
             loadGameToolStripMenuItem.DropDownItems.Clear();
+            overwriteSaveToolStripMenuItem.DropDownItems.Clear();
 
             // Read the save game file and save data to the string array
             // Each line in the file will be a separate index in the array
@@ -585,13 +588,51 @@ namespace Assignment1
                 // Serialise each line in the array into a Object and add objects intoa list of objects
                 saveGames.Add(JsonSerializer.Deserialize<SaveGame>(saveData[i]));
 
-                // Create a new drop down item for the load game drop down and insert it
+                // Create a new drop down item for the load game drop down and Overwrite save and insert it
                 ToolStripMenuItem newItem = new ToolStripMenuItem { Name = "New save " + i.ToString(), Text = saveGames[i].saveName };
                 loadGameToolStripMenuItem.DropDownItems.Insert(i, newItem);
 
+                ToolStripMenuItem newOverwrite = new ToolStripMenuItem { Name = "Overwrite Save" + i.ToString(), Text = saveGames[i].saveName };
+                overwriteSaveToolStripMenuItem.DropDownItems.Insert(i, newOverwrite);
+
                 // Event handler for the new drop down item, when clicked, LoadGame function will run
                 loadGameToolStripMenuItem.DropDownItems[i].Click += new EventHandler(LoadGame);
+
+                // Event handler for overwrite save game
+                overwriteSaveToolStripMenuItem.DropDownItems[i].Click += new EventHandler(HandlerOverwriteSave);
             }
+        }
+
+        /// <summary>
+        ///     Handler to catch when the player presses the overwrite save button. Prompts for a new save name and if it already exists, set as default, then call OverwriteSave();
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HandlerOverwriteSave(object sender, EventArgs e)
+        {
+            // The default name for the save game, this ensures it will be unique everytime
+            string defaultSaveName = DateTime.Now.ToString();
+
+            // Display a message box for the player to choose the name of their save game
+            string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save Game", defaultSaveName);
+
+            // If the player presses the cancel button, this will return false, otherwise it will continue with
+            // the default value from the input box
+            if (!String.IsNullOrEmpty(saveName))
+            {
+                // Iterate through all of the current saveGame objects, and check if the current saveName is taken
+                for (int i = 0; i < saveGames.Count; i++)
+                {
+                    if (saveGames[i].saveName == saveName)
+                    {
+                        MessageBox.Show("Save name already exists, setting name as default name");
+                        saveName = defaultSaveName;
+                        break;
+                    }
+                }
+                OverwriteSave(sender.ToString(), saveName);
+            }
+
         }
 
         /// <summary>
@@ -674,7 +715,7 @@ namespace Assignment1
         {
             // Initialise the bool as the value of the information panel check button to change visibility to
             bool isChecked = informationPanelToolStripMenuItem.Checked;
-            
+
             // Change visibility of information panel items
             lblP1Val.Visible = isChecked;
             lblP2Val.Visible = isChecked;
@@ -683,7 +724,7 @@ namespace Assignment1
             txtBoxP1Name.Visible = isChecked;
             txtBoxP2Name.Visible = isChecked;
             picBoxPlayerToMove.Visible = isChecked;
-            
+
         }
     }
 }
