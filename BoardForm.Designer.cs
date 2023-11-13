@@ -34,6 +34,7 @@
             saveGameToolStripMenuItem = new ToolStripMenuItem();
             overwriteSaveToolStripMenuItem = new ToolStripMenuItem();
             loadGameToolStripMenuItem = new ToolStripMenuItem();
+            exitToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             speakToolStripMenuItem = new ToolStripMenuItem();
             informationPanelToolStripMenuItem = new ToolStripMenuItem();
@@ -66,7 +67,7 @@
             // 
             // gameToolStripMenuItem
             // 
-            gameToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { newGameToolStripMenuItem, saveGameToolStripMenuItem, overwriteSaveToolStripMenuItem, loadGameToolStripMenuItem });
+            gameToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { newGameToolStripMenuItem, saveGameToolStripMenuItem, overwriteSaveToolStripMenuItem, loadGameToolStripMenuItem, exitToolStripMenuItem });
             gameToolStripMenuItem.Name = "gameToolStripMenuItem";
             gameToolStripMenuItem.Size = new Size(62, 24);
             gameToolStripMenuItem.Text = "Game";
@@ -74,28 +75,35 @@
             // newGameToolStripMenuItem
             // 
             newGameToolStripMenuItem.Name = "newGameToolStripMenuItem";
-            newGameToolStripMenuItem.Size = new Size(224, 26);
+            newGameToolStripMenuItem.Size = new Size(191, 26);
             newGameToolStripMenuItem.Text = "New Game";
             newGameToolStripMenuItem.Click += NewGameToolStripMenuItem_Click;
             // 
             // saveGameToolStripMenuItem
             // 
             saveGameToolStripMenuItem.Name = "saveGameToolStripMenuItem";
-            saveGameToolStripMenuItem.Size = new Size(224, 26);
+            saveGameToolStripMenuItem.Size = new Size(191, 26);
             saveGameToolStripMenuItem.Text = "Save Game";
             saveGameToolStripMenuItem.Click += SaveGameToolStripMenuItem_Click;
             // 
             // overwriteSaveToolStripMenuItem
             // 
             overwriteSaveToolStripMenuItem.Name = "overwriteSaveToolStripMenuItem";
-            overwriteSaveToolStripMenuItem.Size = new Size(224, 26);
+            overwriteSaveToolStripMenuItem.Size = new Size(191, 26);
             overwriteSaveToolStripMenuItem.Text = "Overwrite Save";
             // 
             // loadGameToolStripMenuItem
             // 
             loadGameToolStripMenuItem.Name = "loadGameToolStripMenuItem";
-            loadGameToolStripMenuItem.Size = new Size(224, 26);
+            loadGameToolStripMenuItem.Size = new Size(191, 26);
             loadGameToolStripMenuItem.Text = "Restore Game";
+            // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.Size = new Size(191, 26);
+            exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Click += ExitToolStripMenuItem_Click;
             // 
             // settingsToolStripMenuItem
             // 
@@ -233,6 +241,7 @@
             Name = "BoardForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "O'Neillo Game";
+            FormClosing += BoardForm_FormClosing;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
@@ -264,5 +273,6 @@
         private ToolStripMenuItem informationPanelToolStripMenuItem;
         private ToolStripMenuItem overwriteSaveToolStripMenuItem;
         private ToolStripMenuItem aboutToolStripMenuItem;
+        private ToolStripMenuItem exitToolStripMenuItem;
     }
 }

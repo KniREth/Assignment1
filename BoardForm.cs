@@ -8,7 +8,7 @@ using System.Xml.Linq;
 using Microsoft.VisualBasic;
 using System.Speech.Synthesis;
 using System.Speech.Recognition;
-
+using System.ComponentModel;
 
 namespace Assignment1
 {
@@ -33,6 +33,9 @@ namespace Assignment1
 
         // All of the SaveGame objects which have been deserialised from the SaveGame.JSON file
         List<SaveGame> saveGames = new List<SaveGame>();
+
+        // boolean to check whether game has been saved when user tries to leave game
+        bool isGameSaved = false;
 
         // Valid tiles for each player
         List<Point> validTiles = new List<Point>();
@@ -67,14 +70,14 @@ namespace Assignment1
         {
             InitializeComponent();
 
-            Point top = new Point(10, 30);
-            Point bottom = new Point(10, 65);
+            Point topLeftCorner = new Point(10, 30);
+            Point bottomLeftCorner = new Point(10, 65);
             gameValueData = this.InitialiseBoard();
 
 
             try
             {
-                gameGUIData = new GameboardImageArray(this, gameValueData, top, bottom, 0, tileImagesDirPath);
+                gameGUIData = new GameboardImageArray(this, gameValueData, topLeftCorner, bottomLeftCorner, 0, tileImagesDirPath);
                 gameGUIData.TileClicked += new GameboardImageArray.TileClickedEventDelegate(GameTileClicked);
                 gameGUIData.UpdateBoardGui(gameValueData);
             }
@@ -107,6 +110,7 @@ namespace Assignment1
                 DialogResult result = MessageBox.Show(ex.ToString(), "Cannot load speech synthesizer");
                 this.Close();
             }
+
         }
 
         /// <summary>
@@ -163,6 +167,8 @@ namespace Assignment1
         {
             // Flag to check whether values need to be updated
             bool moveCheck = false;
+
+            isGameSaved = false;
 
             // Set the row and col into variables for readability
             int selectionRow = gameGUIData.GetCurrentRowIndex(sender);
@@ -611,6 +617,8 @@ namespace Assignment1
 
                         // Serialise and append this data to the save game file
                         File.AppendAllText(saveDataDirPath, newSave.Serialise() + "\n");
+
+                        isGameSaved = true;
                     }
                 }
             }
@@ -659,6 +667,9 @@ namespace Assignment1
                 // Rewrite the file with all new objects
                 File.AppendAllText(saveDataDirPath, saveGames[i].Serialise() + "\n");
             }
+            // Game has just been saved, so set isGameSaved as true
+            isGameSaved = true;
+
             // Load all of the new save games back to the menu
             GetSaveGames();
         }
@@ -813,6 +824,9 @@ namespace Assignment1
                 // Loading an active game so names shouldn't be editable
                 txtBoxP1Name.Enabled = false;
                 txtBoxP2Name.Enabled = false;
+
+                // This game has just been loaded, so is saved, therefore set isGameSaved as true
+                isGameSaved = true; 
             }
         }
 
@@ -888,9 +902,24 @@ namespace Assignment1
         /// <param name="e"></param>
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             Form1 form1 = new Form1();
             form1.ShowDialog();
+        }
+
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (isGameSaved) { this.Close(); }
+            DialogResult result = MessageBox.Show("The current game instance is not saved. Continue?", "Exit Game", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes) { this.Close(); }
+        }
+
+        private void BoardForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!isGameSaved)
+            {
+                DialogResult result = MessageBox.Show("The current game instance is not saved. Continue?", "Exit Game", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes) { } else { e.Cancel = true; }
+            }
         }
     }
 }
