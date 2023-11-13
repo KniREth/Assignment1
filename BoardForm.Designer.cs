@@ -38,6 +38,7 @@
             speakToolStripMenuItem = new ToolStripMenuItem();
             informationPanelToolStripMenuItem = new ToolStripMenuItem();
             helpToolStripMenuItem = new ToolStripMenuItem();
+            aboutToolStripMenuItem = new ToolStripMenuItem();
             txtBoxP1Name = new TextBox();
             txtBoxP2Name = new TextBox();
             lblP1Val = new Label();
@@ -73,28 +74,28 @@
             // newGameToolStripMenuItem
             // 
             newGameToolStripMenuItem.Name = "newGameToolStripMenuItem";
-            newGameToolStripMenuItem.Size = new Size(191, 26);
+            newGameToolStripMenuItem.Size = new Size(224, 26);
             newGameToolStripMenuItem.Text = "New Game";
             newGameToolStripMenuItem.Click += NewGameToolStripMenuItem_Click;
             // 
             // saveGameToolStripMenuItem
             // 
             saveGameToolStripMenuItem.Name = "saveGameToolStripMenuItem";
-            saveGameToolStripMenuItem.Size = new Size(191, 26);
+            saveGameToolStripMenuItem.Size = new Size(224, 26);
             saveGameToolStripMenuItem.Text = "Save Game";
             saveGameToolStripMenuItem.Click += SaveGameToolStripMenuItem_Click;
             // 
             // overwriteSaveToolStripMenuItem
             // 
             overwriteSaveToolStripMenuItem.Name = "overwriteSaveToolStripMenuItem";
-            overwriteSaveToolStripMenuItem.Size = new Size(191, 26);
+            overwriteSaveToolStripMenuItem.Size = new Size(224, 26);
             overwriteSaveToolStripMenuItem.Text = "Overwrite Save";
             // 
             // loadGameToolStripMenuItem
             // 
             loadGameToolStripMenuItem.Name = "loadGameToolStripMenuItem";
-            loadGameToolStripMenuItem.Size = new Size(191, 26);
-            loadGameToolStripMenuItem.Text = "Load Game";
+            loadGameToolStripMenuItem.Size = new Size(224, 26);
+            loadGameToolStripMenuItem.Text = "Restore Game";
             // 
             // settingsToolStripMenuItem
             // 
@@ -123,9 +124,17 @@
             // 
             // helpToolStripMenuItem
             // 
+            helpToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { aboutToolStripMenuItem });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new Size(55, 24);
             helpToolStripMenuItem.Text = "Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            aboutToolStripMenuItem.Size = new Size(133, 26);
+            aboutToolStripMenuItem.Text = "About";
+            aboutToolStripMenuItem.Click += AboutToolStripMenuItem_Click;
             // 
             // txtBoxP1Name
             // 
@@ -254,5 +263,6 @@
         private ToolStripMenuItem speakToolStripMenuItem;
         private ToolStripMenuItem informationPanelToolStripMenuItem;
         private ToolStripMenuItem overwriteSaveToolStripMenuItem;
+        private ToolStripMenuItem aboutToolStripMenuItem;
     }
 }

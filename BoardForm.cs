@@ -25,7 +25,7 @@ namespace Assignment1
         const int numCols = 8;
 
         // Player 0 is white, player 1 is black. White plays first
-        int player = 0;
+        internal int player = 0;
 
         // The initial number of tiles each player has on the board
         int blackTiles = 2;
@@ -41,7 +41,7 @@ namespace Assignment1
         string saveDataDirPath = Directory.GetCurrentDirectory() + @"\saves\game_data.JSON";
 
         // Offsets are the tiles that surround the current tile
-        List<Point> offsets = new List<Point>
+        internal List<Point> offsets = new List<Point>
         {
             new Point(-1, -1), // Diag up left
             new Point(-1, 0), // Up
@@ -55,8 +55,8 @@ namespace Assignment1
 
 
         // Initialise an array of pic boxes for board
-        GameboardImageArray _gameBoardGui;
-        int[,] gameBoardData;
+        internal GameboardImageArray gameGUIData;
+        internal int[,] gameValueData;
         string tileImagesDirPath = Directory.GetCurrentDirectory() + @"\images\";
 
         // Initialise speech synthesis and the string array of voices for use by different players
@@ -69,14 +69,14 @@ namespace Assignment1
 
             Point top = new Point(10, 30);
             Point bottom = new Point(10, 65);
-            gameBoardData = this.MakeBoardArray();
+            gameValueData = this.InitialiseBoard();
 
 
             try
             {
-                _gameBoardGui = new GameboardImageArray(this, gameBoardData, top, bottom, 0, tileImagesDirPath);
-                _gameBoardGui.TileClicked += new GameboardImageArray.TileClickedEventDelegate(GameTileClicked);
-                _gameBoardGui.UpdateBoardGui(gameBoardData);
+                gameGUIData = new GameboardImageArray(this, gameValueData, top, bottom, 0, tileImagesDirPath);
+                gameGUIData.TileClicked += new GameboardImageArray.TileClickedEventDelegate(GameTileClicked);
+                gameGUIData.UpdateBoardGui(gameValueData);
             }
             catch (Exception ex)
             {
@@ -113,7 +113,7 @@ namespace Assignment1
         ///         Creates an array with default map values. All squares will be clear other than the middle 4.
         /// </summary>
         /// <returns></returns>
-        private int[,] MakeBoardArray()
+        private int[,] InitialiseBoard()
         {
             // Create a new 2d board array and set the length to the number of rows and cols in the board
             int[,] boardArray = new int[numRows, numCols];
@@ -139,9 +139,9 @@ namespace Assignment1
                     // Update the array at the current position to the corrosponding value as found above
                     boardArray[row, col] = boardVal;
 
-                    if (_gameBoardGui != null)
+                    if (gameGUIData != null)
                     {
-                        _gameBoardGui.SetTile(row, col, boardVal.ToString());
+                        gameGUIData.SetTile(row, col, boardVal.ToString());
                     }
                 }
             }
@@ -165,15 +165,15 @@ namespace Assignment1
             bool moveCheck = false;
 
             // Set the row and col into variables for readability
-            int selectionRow = _gameBoardGui.GetCurrentRowIndex(sender);
-            int selectionCol = _gameBoardGui.GetCurrentColumnIndex(sender);
+            int selectionRow = gameGUIData.GetCurrentRowIndex(sender);
+            int selectionCol = gameGUIData.GetCurrentColumnIndex(sender);
 
             // If either of the player hasn't entered a name, give them a default name
             if (!p1NameEntered) { txtBoxP1Name.Text = "Player #1"; }
             if (!p2NameEntered) { txtBoxP2Name.Text = "Player #2"; }
 
             // Initial validity check, if the tile is 10, it is a clear tile and hence may be valid
-            if (gameBoardData[selectionRow, selectionCol] == 10)
+            if (gameValueData[selectionRow, selectionCol] == 10)
             {
                 // The game has now started so make it so the players cannot change their name anymore
                 txtBoxP1Name.Enabled = false;
@@ -191,11 +191,11 @@ namespace Assignment1
                         for (int y = 0; y < TileCheck.Item1.Count; y++)
                         {
                             // If the point is not currently the player's tile, change it to the players tile and update totals
-                            if (gameBoardData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] != player)
+                            if (gameValueData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] != player)
                             {
-                                gameBoardData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] = player;
+                                gameValueData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] = player;
 
-                                _gameBoardGui.SetTile(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
+                                gameGUIData.SetTile(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
                                 UpdatePlayerTotals(1, 1);
 
                                 moveCheck = true;
@@ -209,8 +209,8 @@ namespace Assignment1
                 // If the player has completed a valid move, update the current index and update player values then switch player
                 if (moveCheck)
                 {
-                    gameBoardData[selectionRow, selectionCol] = player;
-                    _gameBoardGui.SetTile(selectionRow, selectionCol, player.ToString());
+                    gameValueData[selectionRow, selectionCol] = player;
+                    gameGUIData.SetTile(selectionRow, selectionCol, player.ToString());
                     UpdatePlayerTotals(1, 0);
 
                     // If speech synthesis is on, say the tile which has been taken
@@ -247,9 +247,9 @@ namespace Assignment1
             // Clear valid tiles so that they can be reset 
             for (int y = 0; y < validTiles.Count; y++)
             {
-                if (Path.GetFileNameWithoutExtension(_gameBoardGui.GetTile(validTiles[y].X, validTiles[y].Y).ImageLocation) == "Available")
+                if (Path.GetFileNameWithoutExtension(gameGUIData.GetTile(validTiles[y].X, validTiles[y].Y).ImageLocation) == "Available")
                 {
-                    _gameBoardGui.SetTile(validTiles[y].X, validTiles[y].Y, "10");
+                    gameGUIData.SetTile(validTiles[y].X, validTiles[y].Y, "10");
                 }
             }
 
@@ -368,13 +368,13 @@ namespace Assignment1
             List<Point> validTiles = new List<Point>();
 
             // Iterate through the rows
-            for (int i = 0; i < gameBoardData.GetLength(0); i++)
+            for (int i = 0; i < gameValueData.GetLength(0); i++)
             {
                 // Iterate through the columns
-                for (int j = 0; j < gameBoardData.GetLength(1); j++)
+                for (int j = 0; j < gameValueData.GetLength(1); j++)
                 {
                     // Check if the current position is clear
-                    if (gameBoardData[i, j] == 10)
+                    if (gameValueData[i, j] == 10)
                     {
                         // Iterate through all of the offsets around the current position
                         for (int x = 0; x < offsets.Count; x++)
@@ -386,7 +386,7 @@ namespace Assignment1
                             if (isValid.Item1.Count > 0 && isValid.Item2)
                             {
                                 validTiles.Add(new Point(i, j));
-                                _gameBoardGui.SetTile(i, j, "Available");
+                                gameGUIData.SetTile(i, j, "Available");
                             }
                         }
                     }
@@ -410,7 +410,7 @@ namespace Assignment1
         /// <param name="visitedTiles">This is all of the tiles that have been visited and checked, if the path is eventually
         ///                            valid, this List will be returned</param>
         /// <returns>A list of valid tiles and a boolean to say whether the path is valid or not</returns>
-        private (List<Point>, bool) IsTileValid(int currentRow, int currentCol, Point currentOffset, List<Point> visitedTiles)
+        internal (List<Point>, bool) IsTileValid(int currentRow, int currentCol, Point currentOffset, List<Point> visitedTiles)
         {
             // Separate the offset Point into separate variables for readability
             currentRow += currentOffset.X;
@@ -423,13 +423,13 @@ namespace Assignment1
             }
 
             // Check if the current offset is a clear tile, if so then retrace the recursion
-            if (gameBoardData[currentRow, currentCol] == 10)
+            if (gameValueData[currentRow, currentCol] == 10)
             {
                 return (new List<Point>(), false);
             }
 
             // Check if the current offset tile is taken by the opposing player, if so then add the tile to the list and start recursion
-            if (gameBoardData[currentRow, currentCol] != player)
+            if (gameValueData[currentRow, currentCol] != player)
             {
                 // Add the tile to the visited tile array to be changed if the path is valid
                 visitedTiles.Add(new Point(currentRow, currentCol));
@@ -450,7 +450,7 @@ namespace Assignment1
         /// </summary>
         /// <param name="valueToAdd">The value to add to the current player's total</param>
         /// <param name="valueToRemove">The value to remove from the opposing player's total</param>
-        private void UpdatePlayerTotals(int valueToAdd, int valueToRemove)
+        internal void UpdatePlayerTotals(int valueToAdd, int valueToRemove)
         {
             // Check if it is player 1
             if (player == 0)
@@ -525,7 +525,7 @@ namespace Assignment1
         private void ResetMap()
         {
             // Reset board data
-            gameBoardData = MakeBoardArray();
+            gameValueData = InitialiseBoard();
 
             // Fetch all of the current valid tiles to be displayed
             GetValidTiles();
@@ -597,12 +597,12 @@ namespace Assignment1
                         int[][] gameData = new int[8][];
 
                         // Copy the data from gameboard data to the new jagged array
-                        for (int i = 0; i < gameBoardData.GetLength(0); i++)
+                        for (int i = 0; i < gameValueData.GetLength(0); i++)
                         {
                             gameData[i] = new int[8];
-                            for (int j = 0; j < gameBoardData.GetLength(1); j++)
+                            for (int j = 0; j < gameValueData.GetLength(1); j++)
                             {
-                                gameData[i][j] = gameBoardData[i, j];
+                                gameData[i][j] = gameValueData[i, j];
                             }
                         }
 
@@ -648,11 +648,11 @@ namespace Assignment1
                     saveGames[i].player1Name = txtBoxP1Name.Text;
                     saveGames[i].player2Name = txtBoxP2Name.Text;
                     saveGames[i].playerTurn = player;
-                    for (int j = 0; j < gameBoardData.GetLength(0); j++)
+                    for (int j = 0; j < gameValueData.GetLength(0); j++)
                     {
-                        for (int x = 0; x < gameBoardData.GetLength(1); x++)
+                        for (int x = 0; x < gameValueData.GetLength(1); x++)
                         {
-                            saveGames[i].gameData[j][x] = gameBoardData[j, x];
+                            saveGames[i].gameData[j][x] = gameValueData[j, x];
                         }
                     }
                 }
@@ -795,12 +795,12 @@ namespace Assignment1
                 txtBoxP2Name.Text = saveGames[indexToLoad].player2Name;
                 if (saveGames[indexToLoad].playerTurn != player) { SwapPlayer(); }
                 // Iterate through the game board and change the tiles to game to load's tiles
-                for (int i = 0; i < gameBoardData.GetLength(0); i++)
+                for (int i = 0; i < gameValueData.GetLength(0); i++)
                 {
-                    for (int j = 0; j < gameBoardData.GetLength(1); j++)
+                    for (int j = 0; j < gameValueData.GetLength(1); j++)
                     {
-                        gameBoardData[i, j] = saveGames[indexToLoad].gameData[i][j];
-                        _gameBoardGui.SetTile(i, j, gameBoardData[i, j].ToString());
+                        gameValueData[i, j] = saveGames[indexToLoad].gameData[i][j];
+                        gameGUIData.SetTile(i, j, gameValueData[i, j].ToString());
                     }
                 }
 
@@ -823,15 +823,15 @@ namespace Assignment1
         {
             whiteTiles = 0;
             blackTiles = 0;
-            for (int i = 0; i < gameBoardData.GetLength(0); i++)
+            for (int i = 0; i < gameValueData.GetLength(0); i++)
             {
-                for (int j = 0; j < gameBoardData.GetLength(1); j++)
+                for (int j = 0; j < gameValueData.GetLength(1); j++)
                 {
-                    if (gameBoardData[i, j] == 0)
+                    if (gameValueData[i, j] == 0)
                     {
                         whiteTiles += 1;
                     }
-                    else if (gameBoardData[i, j] == 1)
+                    else if (gameValueData[i, j] == 1)
                     {
                         blackTiles += 1;
                     }
@@ -876,6 +876,21 @@ namespace Assignment1
                 speechSynth.Speak("Speech synthesis turned on.");
             }
             else { speechSynth.Speak("Speech synthesis turned off"); }
+        }
+
+
+        /// <summary>
+        ///         When the player clicks the about button, the About form will be
+        ///         shown onto the screen. This screen will be modal so that they cannot 
+        ///         access the main form until this form is closed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            Form1 form1 = new Form1();
+            form1.ShowDialog();
         }
     }
 }
