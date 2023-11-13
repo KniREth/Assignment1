@@ -532,6 +532,10 @@ namespace Assignment1
 
             // Get player totals to load to screen
             GetPlayerTotals();
+
+            // Allow the player to enter their name again
+            txtBoxP1Name.Enabled = true;
+            txtBoxP2Name.Enabled = true;
         }
 
         /// <summary>
@@ -801,6 +805,10 @@ namespace Assignment1
 
                 // Get the player totals to display to screen
                 GetPlayerTotals();
+
+                // Loading an active game so names shouldn't be editable
+                txtBoxP1Name.Enabled = false;
+                txtBoxP2Name.Enabled = false;
             }
         }
 
