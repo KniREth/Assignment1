@@ -906,6 +906,13 @@ namespace Assignment1
             form1.ShowDialog();
         }
 
+        /// <summary>
+        ///         When the user presses the exit game button in the game menu, check if the 
+        ///         game is saved and then close the game. If the game isn't saved, prompt the user 
+        ///         to save the game.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (isGameSaved) { this.Close(); }
@@ -913,12 +920,19 @@ namespace Assignment1
             if (result == DialogResult.Yes) { this.Close(); }
         }
 
+        /// <summary>
+        ///         When the user presses the close button on the top right of screen, check if the 
+        ///         game is saved and then close the game. If the game isn't saved, prompt the user 
+        ///         to save the game.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BoardForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (!isGameSaved)
             {
                 DialogResult result = MessageBox.Show("The current game instance is not saved. Continue?", "Exit Game", MessageBoxButtons.YesNo);
-                if (result == DialogResult.Yes) { } else { e.Cancel = true; }
+                if (result == DialogResult.No) { e.Cancel = true; }
             }
         }
     }
