@@ -184,83 +184,8 @@ namespace GameboardGUI
             return true;
         }
 
-        /// <summary>
-        /// Changes all images within the array to Red.png or Blue.png.
-        /// Use this to change all the tiles to Red or Blue.
-        /// These files must be present at default image location provided to the class constructor.
-        /// When tileColor is not specified or an invalid tileColor value (not Red of Blue) is used, it defaults to Blue.
-        /// </summary>
-        /// <param name="tileColor">This is the filename stored within the default image location e.g. Red or Blue</param>
-        public void ToRedOrBlueBoard(string tileColor = "Blue")
-        {
-            switch (tileColor[0].ToString().ToLower())
-            {
-                case "r":
-                    tileColor = "Red";
-                    break;
-                case "b":
-                    tileColor = "Blue";
-                    break;
-                default:
-                    tileColor = "Blue";
-                    break;
-            }
-            for (int r = 0; r < _boardRows; r++)
-            {
-                for (int c = 0; c < _boardCols; c++)
-                {
-                    _boardTiles[r, c].ImageLocation = _tileImagesPath + tileColor + ".PNG";
-                }
-            }
 
-        }
 
-        /// <summary>
-        /// This method Shows the  image stated within the sent array in it location.
-        /// </summary>
-        /// <param name="updateArray">The int 2D array</param>
-        /// <param name="row">The row index that needs to be updated/displayed</param>
-        /// <param name="c">The col index that needs to be updated/displayed</param>
-        /// <returns>Return True if it succeeds and False if it does not.</returns>
-        public bool ShowElement(int[,] updateArray, int row, int c)
-        {
-            // Checks to see if requested element is within the boundaries
-            if ((row < _boardRows) && (c < _boardCols))
-            {
-                _boardTiles[row, c].ImageLocation = _tileImagesPath + updateArray[row, c].ToString() + ".PNG";
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// This method update the location of the images within the frame as the frame changes sizes.
-        /// </summary>
-        public void UpdateLocation()
-        {
-            // Calculate the Height of each element related to the size of the Form and number required
-            int Available_Height = _containingForm.ClientSize.Height - ((Top + Bottom) + (_tileMargin * _boardCols - 1));
-            // Calculate the Width of each element related to the size of the Form and number required
-            int Available_Width = _containingForm.ClientSize.Width - ((Left + Right) + (_tileMargin * _boardRows - 1));
-            _topY = Top;
-            _topX = Left;
-
-            for (int r = 0; r < _boardRows; r++)
-            {
-                for (int c = 0; c < _boardCols; c++)
-                {
-                    int l = _topX;
-                    if (c > 0)
-                        l = l + (_tileWidth * c) + (_tileMargin * c);
-                    int t = _topY;
-                    if (r > 0)
-                        t = t + (_tileHeight * r) + (_tileMargin * r);
-                    _boardTiles[r, c].Location = new Point(l, t);
-                    _boardTiles[r, c].Size = new Size(_tileWidth, _tileHeight);
-                }
-            }
-        }
 
         /// <summary>
         /// This method displays the gameState on the GUI
