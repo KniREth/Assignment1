@@ -25,7 +25,7 @@ namespace Assignment1
         const int numCols = 8;
 
         // Player 0 is white, player 1 is black. White plays first
-        internal int player = 0;
+        int player = 0;
 
         // The initial number of tiles each player has on the board
         int blackTiles = 2;
@@ -44,7 +44,7 @@ namespace Assignment1
         string saveDataDirPath = Directory.GetCurrentDirectory() + @"\saves\game_data.JSON";
 
         // Offsets are the tiles that surround the current tile
-        internal List<Point> offsets = new List<Point>
+        List<Point> offsets = new List<Point>
         {
             new Point(-1, -1), // Diag up left
             new Point(-1, 0), // Up
@@ -58,8 +58,8 @@ namespace Assignment1
 
 
         // Initialise an array of pic boxes for board
-        internal GameboardImageArray gameGUIData;
-        internal int[,] gameValueData;
+        GameboardImageArray gameGUIData;
+        int[,] gameValueData;
         string tileImagesDirPath = Directory.GetCurrentDirectory() + @"\images\";
 
         // Initialise speech synthesis and the string array of voices for use by different players
@@ -70,8 +70,8 @@ namespace Assignment1
         {
             InitializeComponent();
 
-            Point topLeftCorner = new Point(10, 30);
-            Point bottomLeftCorner = new Point(10, 65);
+            Point topLeftCorner = new Point(50, 30);
+            Point bottomLeftCorner = new Point(50, 65);
             gameValueData = this.InitialiseBoard();
 
 
@@ -153,81 +153,28 @@ namespace Assignment1
             return boardArray;
         }
 
-        // TODO: Possibly break down GameTileClicked into more functions for readability. This function is quite packed atm
-        // Such as creating a CheckPath function maybe?
 
         /// <summary>
-        ///         When the player clicks on the tile, it checks if the current tile is valid and then
-        ///         swaps all of the necessary tiles to the correct colour and updates the player totals.
-        ///         It will then switch to the next player's turn.
+        ///         When the player clicks a tile, it will ensure they cannot change their names as the
+        ///         game has now started and if they haven't yet entered a name they will have it set to default. 
+        ///         It will also then send the row and col to CheckPath to change the tile if it is valid.
+        ///         It will then check if the game is over and if so give the option to start a new game.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void GameTileClicked(object sender, EventArgs e)
         {
-            // Flag to check whether values need to be updated
-            bool moveCheck = false;
 
-            isGameSaved = false;
 
             // Set the row and col into variables for readability
-            int selectionRow = gameGUIData.GetCurrentRowIndex(sender);
-            int selectionCol = gameGUIData.GetCurrentColumnIndex(sender);
+            int rowClicked = gameGUIData.GetCurrentRowIndex(sender);
+            int colClicked = gameGUIData.GetCurrentColumnIndex(sender);
 
             // If either of the player hasn't entered a name, give them a default name
             if (!p1NameEntered) { txtBoxP1Name.Text = "Player #1"; }
             if (!p2NameEntered) { txtBoxP2Name.Text = "Player #2"; }
 
-            // Initial validity check, if the tile is 10, it is a clear tile and hence may be valid
-            if (gameValueData[selectionRow, selectionCol] == 10)
-            {
-                // The game has now started so make it so the players cannot change their name anymore
-                txtBoxP1Name.Enabled = false;
-                txtBoxP2Name.Enabled = false;
-
-                // Iterate though the offsets, checking the path
-                for (int x = 0; x < offsets.Count; x++)
-                {
-                    // See if the current tile clicked is valid for the current offset
-                    var TileCheck = IsTileValid(selectionRow, selectionCol, offsets[x], new List<Point>());
-                    // Item 1 is a list of points which will be the visited tiles, Item 2 is a bool to see if the path reaches a clear tile
-                    if (TileCheck.Item2 == true && TileCheck.Item1.Count > 0)
-                    {
-                        // Iterate through the list of points
-                        for (int y = 0; y < TileCheck.Item1.Count; y++)
-                        {
-                            // If the point is not currently the player's tile, change it to the players tile and update totals
-                            if (gameValueData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] != player)
-                            {
-                                gameValueData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] = player;
-
-                                gameGUIData.SetTile(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
-                                UpdatePlayerTotals(1, 1);
-
-                                moveCheck = true;
-                            }
-
-                        }
-
-                    }
-                }
-
-                // If the player has completed a valid move, update the current index and update player values then switch player
-                if (moveCheck)
-                {
-                    gameValueData[selectionRow, selectionCol] = player;
-                    gameGUIData.SetTile(selectionRow, selectionCol, player.ToString());
-                    UpdatePlayerTotals(1, 0);
-
-                    // If speech synthesis is on, say the tile which has been taken
-                    if (speakToolStripMenuItem.Checked)
-                    {
-                        // Add 1 to each due to 0 indexing
-                        speechSynth.Speak("Player" + (player + 1).ToString() + " has placed a token at " + (selectionRow + 1).ToString() + " " + (selectionCol + 1).ToString());
-                    }
-                    SwapPlayer();
-                }
-            }
+            CheckPath(rowClicked, colClicked);
 
             if (CheckGameOver() || CheckStalemate())
             {
@@ -262,6 +209,73 @@ namespace Assignment1
             // Get all of the valid tiles for the player
             validTiles = GetValidTiles();
 
+        }
+
+        /// <summary>
+        ///         When the player clicks on the tile, it checks if the current tile is valid and then
+        ///         swaps all of the necessary tiles to the correct colour and updates the player totals.
+        ///         It will then switch to the next player's turn.
+        /// </summary>
+        /// <param name="rowClicked"></param>
+        /// <param name="colClicked"></param>
+        private void CheckPath(int rowClicked, int colClicked)
+        {
+            // Flag to check whether values need to be updated
+            bool moveCheck = false;
+
+            // Initial validity check, if the tile is 10, it is a clear tile and hence may be valid
+            if (gameValueData[rowClicked, colClicked] == 10)
+            {
+                // The game has now started so make it so the players cannot change their name anymore
+                txtBoxP1Name.Enabled = false;
+                txtBoxP2Name.Enabled = false;
+
+                // Iterate though the offsets, checking the path
+                for (int x = 0; x < offsets.Count; x++)
+                {
+                    // See if the current tile clicked is valid for the current offset
+                    var TileCheck = IsTileValid(rowClicked, colClicked, offsets[x], new List<Point>());
+                    // Item 1 is a list of points which will be the visited tiles, Item 2 is a bool to see if the path reaches a clear tile
+                    if (TileCheck.Item2 == true && TileCheck.Item1.Count > 0)
+                    {
+                        // Iterate through the list of points
+                        for (int y = 0; y < TileCheck.Item1.Count; y++)
+                        {
+                            // If the point is not currently the player's tile, change it to the players tile and update totals
+                            if (gameValueData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] != player)
+                            {
+                                gameValueData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] = player;
+
+                                gameGUIData.SetTile(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
+                                UpdatePlayerTotals(1, 1);
+
+                                moveCheck = true;
+
+                                // The game instance is changing, so therefore isn't saved.
+                                isGameSaved = false;
+                            }
+
+                        }
+
+                    }
+                }
+
+                // If the player has completed a valid move, update the current index and update player values then switch player
+                if (moveCheck)
+                {
+                    gameValueData[rowClicked, colClicked] = player;
+                    gameGUIData.SetTile(rowClicked, colClicked, player.ToString());
+                    UpdatePlayerTotals(1, 0);
+
+                    // If speech synthesis is on, say the tile which has been taken
+                    if (speakToolStripMenuItem.Checked)
+                    {
+                        // Add 1 to each due to 0 indexing
+                        speechSynth.Speak("Player" + (player + 1).ToString() + " has placed a token at " + (rowClicked + 1).ToString() + " " + (colClicked + 1).ToString());
+                    }
+                    SwapPlayer();
+                }
+            }
         }
 
         /// <summary>
@@ -416,7 +430,7 @@ namespace Assignment1
         /// <param name="visitedTiles">This is all of the tiles that have been visited and checked, if the path is eventually
         ///                            valid, this List will be returned</param>
         /// <returns>A list of valid tiles and a boolean to say whether the path is valid or not</returns>
-        internal (List<Point>, bool) IsTileValid(int currentRow, int currentCol, Point currentOffset, List<Point> visitedTiles)
+        private (List<Point>, bool) IsTileValid(int currentRow, int currentCol, Point currentOffset, List<Point> visitedTiles)
         {
             // Separate the offset Point into separate variables for readability
             currentRow += currentOffset.X;
@@ -456,7 +470,7 @@ namespace Assignment1
         /// </summary>
         /// <param name="valueToAdd">The value to add to the current player's total</param>
         /// <param name="valueToRemove">The value to remove from the opposing player's total</param>
-        internal void UpdatePlayerTotals(int valueToAdd, int valueToRemove)
+        private void UpdatePlayerTotals(int valueToAdd, int valueToRemove)
         {
             // Check if it is player 1
             if (player == 0)
@@ -733,46 +747,30 @@ namespace Assignment1
         }
 
         /// <summary>
-        ///     Handler to catch when the player presses the overwrite save button. Prompts for a new save name and if it already exists, set as default, then call OverwriteSave();
+        ///         Looks through the game array to see how many tiles each player currently has
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void HandlerOverwriteSave(object sender, EventArgs e)
+        private void GetPlayerTotals()
         {
-            // The default name for the save game, this ensures it will be unique everytime
-            string defaultSaveName = DateTime.Now.ToString();
-
-            // Speech if required
-            if (speakToolStripMenuItem.Checked)
+            whiteTiles = 0;
+            blackTiles = 0;
+            for (int i = 0; i < gameValueData.GetLength(0); i++)
             {
-                speechSynth.Speak("Enter name of save game.");
-            }
-
-            // Display a message box for the player to choose the name of their save game
-            string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save Game", defaultSaveName);
-
-            // If the player presses the cancel button, this will return false, otherwise it will continue with
-            // the default value from the input box
-            if (!String.IsNullOrEmpty(saveName))
-            {
-                // Iterate through all of the current saveGame objects, and check if the current saveName is taken
-                for (int i = 0; i < saveGames.Count; i++)
+                for (int j = 0; j < gameValueData.GetLength(1); j++)
                 {
-                    if (saveGames[i].saveName == saveName)
+                    if (gameValueData[i, j] == 0)
                     {
-                        // Speech if required
-                        if (speakToolStripMenuItem.Checked)
-                        {
-                            speechSynth.Speak("Save name already exists, setting name as default name.");
-                        }
-                        MessageBox.Show("Save name already exists, setting name as default name");
-                        saveName = defaultSaveName;
-                        break;
+                        whiteTiles += 1;
+                    }
+                    else if (gameValueData[i, j] == 1)
+                    {
+                        blackTiles += 1;
                     }
                 }
-                OverwriteSave(sender.ToString(), saveName);
             }
 
+            // Update the display text for the totals of each player
+            lblP1Val.Text = whiteTiles.ToString() + " x";
+            lblP2Val.Text = blackTiles.ToString() + " x";
         }
 
         /// <summary>
@@ -826,35 +824,51 @@ namespace Assignment1
                 txtBoxP2Name.Enabled = false;
 
                 // This game has just been loaded, so is saved, therefore set isGameSaved as true
-                isGameSaved = true; 
+                isGameSaved = true;
             }
         }
 
         /// <summary>
-        ///         Looks through the game array to see how many tiles each player currently has
+        ///     Handler to catch when the player presses the overwrite save button. Prompts for a new save name and if it already exists, set as default, then call OverwriteSave();
         /// </summary>
-        private void GetPlayerTotals()
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HandlerOverwriteSave(object sender, EventArgs e)
         {
-            whiteTiles = 0;
-            blackTiles = 0;
-            for (int i = 0; i < gameValueData.GetLength(0); i++)
+            // The default name for the save game, this ensures it will be unique everytime
+            string defaultSaveName = DateTime.Now.ToString();
+
+            // Speech if required
+            if (speakToolStripMenuItem.Checked)
             {
-                for (int j = 0; j < gameValueData.GetLength(1); j++)
-                {
-                    if (gameValueData[i, j] == 0)
-                    {
-                        whiteTiles += 1;
-                    }
-                    else if (gameValueData[i, j] == 1)
-                    {
-                        blackTiles += 1;
-                    }
-                }
+                speechSynth.Speak("Enter name of save game.");
             }
 
-            // Update the display text for the totals of each player
-            lblP1Val.Text = whiteTiles.ToString() + " x";
-            lblP2Val.Text = blackTiles.ToString() + " x";
+            // Display a message box for the player to choose the name of their save game
+            string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save Game", defaultSaveName);
+
+            // If the player presses the cancel button, this will return false, otherwise it will continue with
+            // the default value from the input box
+            if (!String.IsNullOrEmpty(saveName))
+            {
+                // Iterate through all of the current saveGame objects, and check if the current saveName is taken
+                for (int i = 0; i < saveGames.Count; i++)
+                {
+                    if (saveGames[i].saveName == saveName)
+                    {
+                        // Speech if required
+                        if (speakToolStripMenuItem.Checked)
+                        {
+                            speechSynth.Speak("Save name already exists, setting name as default name.");
+                        }
+                        MessageBox.Show("Save name already exists, setting name as default name");
+                        saveName = defaultSaveName;
+                        break;
+                    }
+                }
+                OverwriteSave(sender.ToString(), saveName);
+            }
+
         }
 
         /// <summary>
@@ -892,7 +906,6 @@ namespace Assignment1
             else { speechSynth.Speak("Speech synthesis turned off"); }
         }
 
-
         /// <summary>
         ///         When the player clicks the about button, the About form will be
         ///         shown onto the screen. This screen will be modal so that they cannot 
@@ -902,7 +915,7 @@ namespace Assignment1
         /// <param name="e"></param>
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form1 form1 = new Form1();
+            AboutForm form1 = new AboutForm();
             form1.ShowDialog();
         }
 

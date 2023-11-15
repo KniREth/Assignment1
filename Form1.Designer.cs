@@ -1,6 +1,6 @@
 ﻿namespace Assignment1
 {
-    partial class Form1
+    partial class AboutForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutForm));
             lblTitleName = new Label();
             label1 = new Label();
             pictureBox1 = new PictureBox();
@@ -79,7 +79,7 @@
             btnOk.UseVisualStyleBackColor = true;
             btnOk.Click += Button1_Click;
             // 
-            // Form1
+            // AboutForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -88,11 +88,12 @@
             Controls.Add(pictureBox1);
             Controls.Add(label1);
             Controls.Add(lblTitleName);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MaximumSize = new Size(700, 450);
             MinimizeBox = false;
             MinimumSize = new Size(700, 450);
-            Name = "Form1";
+            Name = "AboutForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "About";
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();

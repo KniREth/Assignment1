@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BoardForm));
             menuStrip1 = new MenuStrip();
             gameToolStripMenuItem = new ToolStripMenuItem();
             newGameToolStripMenuItem = new ToolStripMenuItem();
@@ -61,7 +62,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { gameToolStripMenuItem, settingsToolStripMenuItem, helpToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(782, 28);
+            menuStrip1.Size = new Size(772, 28);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -167,7 +168,7 @@
             lblP1Val.AutoSize = true;
             lblP1Val.BackColor = Color.FromArgb(255, 192, 192);
             lblP1Val.Font = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point);
-            lblP1Val.Location = new Point(26, 698);
+            lblP1Val.Location = new Point(17, 698);
             lblP1Val.Name = "lblP1Val";
             lblP1Val.Size = new Size(63, 46);
             lblP1Val.TabIndex = 3;
@@ -178,7 +179,7 @@
             lblP2Val.AutoSize = true;
             lblP2Val.BackColor = Color.FromArgb(255, 192, 192);
             lblP2Val.Font = new Font("Segoe UI", 20F, FontStyle.Regular, GraphicsUnit.Point);
-            lblP2Val.Location = new Point(484, 698);
+            lblP2Val.Location = new Point(480, 698);
             lblP2Val.Name = "lblP2Val";
             lblP2Val.Size = new Size(63, 46);
             lblP2Val.TabIndex = 4;
@@ -189,7 +190,7 @@
             pictureBox1.BackColor = Color.FromArgb(255, 192, 192);
             pictureBox1.Location = new Point(0, 689);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(782, 71);
+            pictureBox1.Size = new Size(792, 71);
             pictureBox1.TabIndex = 5;
             pictureBox1.TabStop = false;
             // 
@@ -233,12 +234,14 @@
             Controls.Add(txtBoxP1Name);
             Controls.Add(menuStrip1);
             Controls.Add(pictureBox1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             MaximizeBox = false;
             MaximumSize = new Size(800, 800);
             MinimizeBox = false;
             MinimumSize = new Size(800, 800);
             Name = "BoardForm";
+            Padding = new Padding(0, 0, 10, 0);
             StartPosition = FormStartPosition.CenterScreen;
             Text = "O'Neillo Game";
             FormClosing += BoardForm_FormClosing;
