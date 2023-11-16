@@ -30,7 +30,7 @@ namespace Assignment1
         int whiteTiles = 2;
 
         // All of the SaveGame objects which have been deserialised from the SaveGame.JSON file
-        List<SaveGame> saveGames = new();
+        readonly List<SaveGame> saveGames = new();
 
         // boolean to check whether game has been saved when user tries to leave game
         bool isGameSaved = false;
@@ -39,10 +39,10 @@ namespace Assignment1
         List<Point> validTiles = new();
 
         // The directory for the save game file
-        string saveDataDirPath = Directory.GetCurrentDirectory() + @"\saves\game_data.JSON";
+        readonly string saveDataDirPath = Directory.GetCurrentDirectory() + @"\saves\game_data.JSON";
 
         // Offsets are the tiles that surround the current tile
-        List<Point> offsets = new()
+        readonly List<Point> offsets = new()
         {
             new Point(-1, -1), // Diag up left
             new Point(-1, 0), // Up
@@ -56,13 +56,13 @@ namespace Assignment1
 
 
         // Initialise an array of pic boxes for board
-        GameboardImageArray? gameGUIData;
+        readonly GameboardImageArray? gameGUIData;
         int[,] gameValueData;
-        string tileImagesDirPath = Directory.GetCurrentDirectory() + @"\images\";
+        readonly string tileImagesDirPath = Directory.GetCurrentDirectory() + @"\images\";
 
         // Initialise speech synthesis and the string array of voices for use by different players
-        SpeechSynthesizer? speechSynth;
-        string[]? voices;
+        readonly SpeechSynthesizer? speechSynth;
+        readonly string[]? voices;
 
         public BoardForm()
         {
