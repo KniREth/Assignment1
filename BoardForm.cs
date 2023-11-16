@@ -69,13 +69,13 @@ namespace Assignment1
             InitializeComponent();
 
             Point topLeftCorner = new Point(50, 30);
-            Point bottomLeftCorner = new Point(50, 65);
+            Point bottomRightCorner = new Point(50, 65);
             gameValueData = this.InitialiseBoard();
 
 
             try
             {
-                gameGUIData = new GameboardImageArray(this, gameValueData, topLeftCorner, bottomLeftCorner, 0, tileImagesDirPath);
+                gameGUIData = new GameboardImageArray(this, gameValueData, topLeftCorner, bottomRightCorner, 0, tileImagesDirPath);
                 gameGUIData.TileClicked += new GameboardImageArray.TileClickedEventDelegate(GameTileClicked);
                 gameGUIData.UpdateBoardGui(gameValueData);
             }
