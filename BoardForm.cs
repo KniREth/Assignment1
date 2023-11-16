@@ -30,19 +30,19 @@ namespace Assignment1
         int whiteTiles = 2;
 
         // All of the SaveGame objects which have been deserialised from the SaveGame.JSON file
-        List<SaveGame> saveGames = new List<SaveGame>();
+        List<SaveGame> saveGames = new();
 
         // boolean to check whether game has been saved when user tries to leave game
         bool isGameSaved = false;
 
         // Valid tiles for each player
-        List<Point> validTiles = new List<Point>();
+        List<Point> validTiles = new();
 
         // The directory for the save game file
         string saveDataDirPath = Directory.GetCurrentDirectory() + @"\saves\game_data.JSON";
 
         // Offsets are the tiles that surround the current tile
-        List<Point> offsets = new List<Point>
+        List<Point> offsets = new()
         {
             new Point(-1, -1), // Diag up left
             new Point(-1, 0), // Up
@@ -68,8 +68,8 @@ namespace Assignment1
         {
             InitializeComponent();
 
-            Point topLeftCorner = new Point(50, 30);
-            Point bottomRightCorner = new Point(50, 65);
+            Point topLeftCorner = new(50, 30);
+            Point bottomRightCorner = new(50, 65);
             gameValueData = this.InitialiseBoard();
 
 
@@ -121,7 +121,7 @@ namespace Assignment1
             int[,] boardArray = new int[numRows, numCols];
 
             // Initialise 0 as the default board value
-            int boardVal = 0;
+            int boardVal;
 
             // For each row
             for (int row = 0; row < numRows; row++)
@@ -141,10 +141,7 @@ namespace Assignment1
                     // Update the array at the current position to the corrosponding value as found above
                     boardArray[row, col] = boardVal;
 
-                    if (gameGUIData != null)
-                    {
-                        gameGUIData.SetTile(row, col, boardVal.ToString());
-                    }
+                    gameGUIData?.SetTile(row, col, boardVal.ToString());
                 }
             }
 
@@ -380,7 +377,7 @@ namespace Assignment1
         private List<Point> GetValidTiles()
         {
             // Initialise the list of points, this will be returned at the end
-            List<Point> validTiles = new List<Point>();
+            List<Point> validTiles = new();
 
             // Iterate through the rows
             for (int i = 0; i < gameValueData.GetLength(0); i++)
@@ -622,7 +619,7 @@ namespace Assignment1
                         }
 
                         // Create a new SaveGame object with the new data 
-                        SaveGame newSave = new SaveGame(saveName, txtBoxP1Name.Text, txtBoxP2Name.Text, gameData, player);
+                        SaveGame newSave = new(saveName, txtBoxP1Name.Text, txtBoxP2Name.Text, gameData, player);
 
                         // Serialise and append this data to the save game file
                         File.AppendAllText(saveDataDirPath, newSave.Serialise() + "\n");
@@ -661,7 +658,7 @@ namespace Assignment1
                 // If the saveGame object's saveName is the same as the param, overwrite that object
                 if (saveGames[i].saveName == saveName)
                 {
-                    //saveGames[i].saveName = newSaveName;
+                    saveGames[i].saveName = newSaveName;
                     saveGames[i].player1Name = txtBoxP1Name.Text;
                     saveGames[i].player2Name = txtBoxP2Name.Text;
                     saveGames[i].playerTurn = player;
@@ -719,10 +716,10 @@ namespace Assignment1
                     saveGames.Add(JsonSerializer.Deserialize<SaveGame>(saveData[i])!);
 
                     // Create a new drop down item for the load game drop down and Overwrite save and insert it
-                    ToolStripMenuItem newItem = new ToolStripMenuItem { Name = "New save " + i.ToString(), Text = saveGames[i].saveName };
+                    ToolStripMenuItem newItem = new() { Name = "New save " + i.ToString(), Text = saveGames[i].saveName };
                     loadGameToolStripMenuItem.DropDownItems.Insert(i, newItem);
 
-                    ToolStripMenuItem newOverwrite = new ToolStripMenuItem { Name = "Overwrite Save" + i.ToString(), Text = saveGames[i].saveName };
+                    ToolStripMenuItem newOverwrite = new() { Name = "Overwrite Save" + i.ToString(), Text = saveGames[i].saveName };
                     overwriteSaveToolStripMenuItem.DropDownItems.Insert(i, newOverwrite);
 
                     // Event handler for the new drop down item, when clicked, LoadGame function will run
@@ -912,7 +909,7 @@ namespace Assignment1
         /// <param name="e"></param>
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AboutForm form1 = new AboutForm();
+            AboutForm form1 = new();
             form1.ShowDialog();
         }
 
