@@ -924,9 +924,7 @@ namespace Assignment1
         /// <param name="e"></param>
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (isGameSaved) { this.Close(); }
-            DialogResult result = MessageBox.Show("The current game instance is not saved. Continue?", "Exit Game", MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes) { this.Close(); }
+            this.Close();
         }
 
         /// <summary>
