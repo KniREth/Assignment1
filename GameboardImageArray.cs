@@ -36,7 +36,7 @@ namespace GameboardGUI
         /// This event handler inside the form is the one that handles the events raised within 
         /// GameBoardImageArray when a tile is clicked.
         /// </summary>
-        public event TileClickedEventDelegate TileClicked;
+        public event TileClickedEventDelegate? TileClicked;
 
 
         private int _topY, _topX, _boardRows, _boardCols, _tileMargin, _tileWidth, _tileHeight;
@@ -209,7 +209,7 @@ namespace GameboardGUI
                     _boardTiles[r, c].Location = new Point(l, t);
                     _boardTiles[r, c].Size = new Size(_tileWidth, _tileHeight);
                     _boardTiles[r, c].ImageLocation = _tileImagesPath + gameStateArray[r, c].ToString() + ".PNG";
-                    _boardTiles[r, c].Click += new EventHandler(TileClickListener);
+                    _boardTiles[r, c].Click += new EventHandler(TileClickListener!);
                     _containingForm.Controls.Add(_boardTiles[r, c]);
                 }
             }
@@ -225,7 +225,7 @@ namespace GameboardGUI
         {
             // Delegate the event to the caller
             if (this != null)
-                TileClicked(sender, e);
+                TileClicked!(sender, e);
         }
 
         private int ComputeTileHeight(int boardHeight)

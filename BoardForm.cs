@@ -12,8 +12,6 @@ using System.ComponentModel;
 
 namespace Assignment1
 {
-
-    // TODO: Create a new class for game logic, makes everything more readable and modular
     public partial class BoardForm : Form
     {
         // Initialise bool for player entering name into txt box
@@ -58,13 +56,13 @@ namespace Assignment1
 
 
         // Initialise an array of pic boxes for board
-        GameboardImageArray gameGUIData;
+        GameboardImageArray? gameGUIData;
         int[,] gameValueData;
         string tileImagesDirPath = Directory.GetCurrentDirectory() + @"\images\";
 
         // Initialise speech synthesis and the string array of voices for use by different players
-        SpeechSynthesizer speechSynth;
-        string[] voices;
+        SpeechSynthesizer? speechSynth;
+        string[]? voices;
 
         public BoardForm()
         {
@@ -167,8 +165,8 @@ namespace Assignment1
 
 
             // Set the row and col into variables for readability
-            int rowClicked = gameGUIData.GetCurrentRowIndex(sender);
-            int colClicked = gameGUIData.GetCurrentColumnIndex(sender);
+            int rowClicked = gameGUIData!.GetCurrentRowIndex(sender);
+            int colClicked = gameGUIData!.GetCurrentColumnIndex(sender);
 
             // If either of the player hasn't entered a name, give them a default name
             if (!p1NameEntered) { txtBoxP1Name.Text = "Player #1"; }
@@ -181,7 +179,7 @@ namespace Assignment1
                 // Speech if required
                 if (speakToolStripMenuItem.Checked)
                 {
-                    speechSynth.Speak("Start a new game?");
+                    speechSynth!.Speak("Start a new game?");
                 }
 
                 // Prompt the user that they will lose unsaved data if they continue
@@ -194,8 +192,6 @@ namespace Assignment1
                     ResetMap();
                 }
             }
-
-            // TODO: See if the below loop can be placed into the top of the GetValidTiles function to help clear up this funciton
 
             // Clear valid tiles so that they can be reset 
             for (int y = 0; y < validTiles.Count; y++)
@@ -246,7 +242,7 @@ namespace Assignment1
                             {
                                 gameValueData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] = player;
 
-                                gameGUIData.SetTile(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
+                                gameGUIData!.SetTile(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
                                 UpdatePlayerTotals(1, 1);
 
                                 moveCheck = true;
@@ -264,14 +260,14 @@ namespace Assignment1
                 if (moveCheck)
                 {
                     gameValueData[rowClicked, colClicked] = player;
-                    gameGUIData.SetTile(rowClicked, colClicked, player.ToString());
+                    gameGUIData!.SetTile(rowClicked, colClicked, player.ToString());
                     UpdatePlayerTotals(1, 0);
 
                     // If speech synthesis is on, say the tile which has been taken
                     if (speakToolStripMenuItem.Checked)
                     {
                         // Add 1 to each due to 0 indexing
-                        speechSynth.Speak("Player" + (player + 1).ToString() + " has placed a token at " + (rowClicked + 1).ToString() + " " + (colClicked + 1).ToString());
+                        speechSynth!.Speak("Player" + (player + 1).ToString() + " has placed a token at " + (rowClicked + 1).ToString() + " " + (colClicked + 1).ToString());
                     }
                     SwapPlayer();
                 }
@@ -291,7 +287,7 @@ namespace Assignment1
                 // Speech if required
                 if (speakToolStripMenuItem.Checked)
                 {
-                    speechSynth.Speak("No valid tiles, swapping player.");
+                    speechSynth!.Speak("No valid tiles, swapping player.");
                 }
 
                 MessageBox.Show("No valid tiles, swapping player.");
@@ -303,7 +299,7 @@ namespace Assignment1
                     // Speech if required
                     if (speakToolStripMenuItem.Checked)
                     {
-                        speechSynth.Speak("No more valid tiles for either players.");
+                        speechSynth!.Speak("No more valid tiles for either players.");
                     }
                     MessageBox.Show("No more valid tiles for either players.");
                     return true;
@@ -335,7 +331,7 @@ namespace Assignment1
             else { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "right.PNG"; }
 
             // Set the speech synthesiser's voice to the specified player
-            speechSynth.SelectVoice(voices[player]);
+            speechSynth!.SelectVoice(voices![player]);
         }
 
         /// <summary>
@@ -354,7 +350,7 @@ namespace Assignment1
                     // Speech if required
                     if (speakToolStripMenuItem.Checked)
                     {
-                        speechSynth.Speak("Game over, White wins!");
+                        speechSynth!.Speak("Game over, White wins!");
                     }
 
                     MessageBox.Show("Game over, White wins!");
@@ -364,7 +360,7 @@ namespace Assignment1
                     // Speech if required
                     if (speakToolStripMenuItem.Checked)
                     {
-                        speechSynth.Speak("Game over, Black wins!");
+                        speechSynth!.Speak("Game over, Black wins!");
                     }
 
                     MessageBox.Show("Game over, Black wins!");
@@ -406,7 +402,7 @@ namespace Assignment1
                             if (isValid.Item1.Count > 0 && isValid.Item2)
                             {
                                 validTiles.Add(new Point(i, j));
-                                gameGUIData.SetTile(i, j, "Available");
+                                gameGUIData!.SetTile(i, j, "Available");
                             }
                         }
                     }
@@ -526,7 +522,7 @@ namespace Assignment1
             // Speech if required
             if (speakToolStripMenuItem.Checked)
             {
-                speechSynth.Speak("Warning, any unsaved progress will be lost. Do you want to continue?");
+                speechSynth!.Speak("Warning, any unsaved progress will be lost. Do you want to continue?");
             }
 
             // Prompt the user that they will lose unsaved data if they continue
@@ -579,7 +575,7 @@ namespace Assignment1
                 // Speech if required
                 if (speakToolStripMenuItem.Checked)
                 {
-                    speechSynth.Speak("Enter name of save game.");
+                    speechSynth!.Speak("Enter name of save game.");
                 }
 
                 // Display a message box for the player to choose the name of their save game
@@ -604,7 +600,7 @@ namespace Assignment1
                         // Speech if required
                         if (speakToolStripMenuItem.Checked)
                         {
-                            speechSynth.Speak("Warning, game name already exists. Do you want to overwrite it?");
+                            speechSynth!.Speak("Warning, game name already exists. Do you want to overwrite it?");
                         }
                         DialogResult choice = MessageBox.Show("Warning, game name already exists.\nOverwrite??", "Game Exists", MessageBoxButtons.YesNo);
                         if (choice == DialogResult.Yes) { OverwriteSave(saveName, saveName); }
@@ -641,7 +637,7 @@ namespace Assignment1
                 // Speech if required
                 if (speakToolStripMenuItem.Checked)
                 {
-                    speechSynth.Speak("You can only have 5 save game slots, choose a game to overwrite.");
+                    speechSynth!.Speak("You can only have 5 save game slots, choose a game to overwrite.");
                 }
                 MessageBox.Show("You can only have 5 save game slots, choose a game to overwrite.");
             }
@@ -721,7 +717,7 @@ namespace Assignment1
                 for (int i = 0; i < saveData.Length; i++)
                 {
                     // Serialise each line in the array into a Object and add objects intoa list of objects
-                    saveGames.Add(JsonSerializer.Deserialize<SaveGame>(saveData[i]));
+                    saveGames.Add(JsonSerializer.Deserialize<SaveGame>(saveData[i])!);
 
                     // Create a new drop down item for the load game drop down and Overwrite save and insert it
                     ToolStripMenuItem newItem = new ToolStripMenuItem { Name = "New save " + i.ToString(), Text = saveGames[i].saveName };
@@ -731,10 +727,10 @@ namespace Assignment1
                     overwriteSaveToolStripMenuItem.DropDownItems.Insert(i, newOverwrite);
 
                     // Event handler for the new drop down item, when clicked, LoadGame function will run
-                    loadGameToolStripMenuItem.DropDownItems[i].Click += new EventHandler(LoadGame);
+                    loadGameToolStripMenuItem.DropDownItems[i].Click += new EventHandler(LoadGame!);
 
                     // Event handler for overwrite save game
-                    overwriteSaveToolStripMenuItem.DropDownItems[i].Click += new EventHandler(HandlerOverwriteSave);
+                    overwriteSaveToolStripMenuItem.DropDownItems[i].Click += new EventHandler(HandlerOverwriteSave!);
                 }
             }
 
@@ -809,7 +805,7 @@ namespace Assignment1
                     for (int j = 0; j < gameValueData.GetLength(1); j++)
                     {
                         gameValueData[i, j] = saveGames[indexToLoad].gameData[i][j];
-                        gameGUIData.SetTile(i, j, gameValueData[i, j].ToString());
+                        gameGUIData!.SetTile(i, j, gameValueData[i, j].ToString());
                     }
                 }
 
@@ -841,7 +837,7 @@ namespace Assignment1
             // Speech if required
             if (speakToolStripMenuItem.Checked)
             {
-                speechSynth.Speak("Enter name of save game.");
+                speechSynth!.Speak("Enter name of save game.");
             }
 
             // Display a message box for the player to choose the name of their save game
@@ -859,14 +855,14 @@ namespace Assignment1
                         // Speech if required
                         if (speakToolStripMenuItem.Checked)
                         {
-                            speechSynth.Speak("Save name already exists, setting name as default name.");
+                            speechSynth!.Speak("Save name already exists, setting name as default name.");
                         }
                         MessageBox.Show("Save name already exists, setting name as default name");
                         saveName = defaultSaveName;
                         break;
                     }
                 }
-                OverwriteSave(sender.ToString(), saveName);
+                OverwriteSave(sender.ToString()!, saveName);
             }
 
         }
@@ -901,9 +897,9 @@ namespace Assignment1
         {
             if (speakToolStripMenuItem.Checked)
             {
-                speechSynth.Speak("Speech synthesis turned on.");
+                speechSynth!.Speak("Speech synthesis turned on.");
             }
-            else { speechSynth.Speak("Speech synthesis turned off"); }
+            else { speechSynth!.Speak("Speech synthesis turned off"); }
         }
 
         /// <summary>
