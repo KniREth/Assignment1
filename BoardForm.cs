@@ -151,7 +151,6 @@ namespace Assignment1
             return boardArray;
         }
 
-
         /// <summary>
         ///         When the player clicks a tile, it will ensure they cannot change their names as the
         ///         game has now started and if they haven't yet entered a name they will have it set to default. 
@@ -744,6 +743,8 @@ namespace Assignment1
 
         /// <summary>
         ///         Looks through the game array to see how many tiles each player currently has
+        ///         and sets the variable storing the amount for each player. 
+        ///         Also sets the string which is displayed on the screen for each player's totals.
         /// </summary>
         private void GetPlayerTotals()
         {
