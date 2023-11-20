@@ -432,40 +432,76 @@ namespace Assignment1
 
 
 
-
+        /// <summary>
+        ///         Setter function for the label which displays the total for each player. 
+        /// </summary>
+        /// <param name="totalP1">The amount which needs to be displayed for player 1</param>
+        /// <param name="totalP2">The amount which needs to be displayed for player 2</param>
         internal void SetPlayerTotalString(string totalP1, string totalP2)
         {
             // Update the display text for the totals of each player
             lblP1Val.Text = totalP1 + " x";
             lblP2Val.Text = totalP2 + " x";
         }
+        /// <summary>
+        ///         Setter function for whether the players should be able to 
+        ///         edit their name in the text box.
+        /// </summary>
+        /// <param name="enabled">Boolean to set if the text boxes should be editable. True = Editable. False = Not editable.</param>
         internal void SetPlayerNameAccessibility(bool enabled)
         {
+            // Set the text box accessibility as the param passed through
             txtBoxP1Name.Enabled = enabled;
             txtBoxP2Name.Enabled = enabled;
         }
+        /// <summary>
+        ///         Getter function for the names that the players enter into the text box.
+        /// </summary>
+        /// <returns>Returns the names of each player as a string array. [Player 1 Name, Player 2 Name].</returns>
         internal string[] GetPlayerNames()
         {
+            // Returns the value stored in the text box for each player.
             return new string[] {txtBoxP1Name.Text, txtBoxP2Name.Text};
         }
-        
+        /// <summary>
+        ///         Setter function for the text box holding the player names.
+        /// </summary>
+        /// <param name="player1Name">String value for the name of Player 1.</param>
+        /// <param name="player2Name">String value for the name of Player 2.</param>
         internal void SetPlayerNames(string player1Name, string player2Name)
         {
+            // Set the text box to the value in the parameters
             txtBoxP1Name.Text = player1Name;
             txtBoxP2Name.Text = player2Name;
         }
+        /// <summary>
+        ///         Clear the items which are displayed in the drop down menus for overwriteSaveToolStripMenuItem 
+        ///         and loadGameToolStripMenuItem.DropDownItems
+        /// </summary>
         internal void ClearDropDownMenus()
         {
+            // Clear menu dropdown items.
             loadGameToolStripMenuItem.DropDownItems.Clear();
             overwriteSaveToolStripMenuItem.DropDownItems.Clear();
         }
-
+        /// <summary>
+        ///         Set whether the menu item should be visible or not for the load game button 
+        ///         and the overwrite save button. This should be set as false if there is no current save games.
+        /// </summary>
+        /// <param name="visible">The value which will determine the menu button visibility. True = Visible. False = Not visible</param>
         internal void SetDropDownMenuVisibility(bool visible)
         {
+            // Set the visibility as the param entered.
             loadGameToolStripMenuItem.Visible = visible;
             overwriteSaveToolStripMenuItem.Visible = visible;
         }
 
+        /// <summary>
+        ///         Create new drop down menu items for the overwrite save button and the load game button. 
+        ///         These will be all of the save games that are loaded.
+        /// </summary>
+        /// <param name="saveGame">The save game which needs to be loaded onto the drop down menu</param>
+        /// <param name="index">The position in the drop down where the current save game is being loaded.</param>
         internal void CreateDropDownMenu(SaveGame saveGame, int index)
         {
             // Create a new drop down item for the load game drop down and Overwrite save and insert it
@@ -482,6 +518,10 @@ namespace Assignment1
             overwriteSaveToolStripMenuItem.DropDownItems[index].Click += new EventHandler(HandlerOverwriteSave!);
         }
 
+        /// <summary>
+        ///         Setter function for the picture box which indicates the next player to move.
+        /// </summary>
+        /// <param name="player">Player determines which picture box should be displayed. Player 1 = Left, Player 2 = Right.</param>
         internal void SetPlayerToMoveIcon(int player)
         {
             // Swap arrow img for next player move
@@ -489,9 +529,39 @@ namespace Assignment1
             else { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "right.PNG"; }
         }
 
-        internal bool IsTextToSpeechActive()
+        /// <summary>
+        ///         Getter function to check whether text to speech is activated or not.
+        /// </summary>
+        /// <returns>Returns a boolean of whether text to speech is checked. True = Active. False = Not Active.</returns>
+        internal bool GetIsTextToSpeechActive()
         {
             return speakToolStripMenuItem.Checked;
+        }
+
+        /// <summary>
+        ///         Checks whether the information panel is checked or not in the menu.
+        /// </summary>
+        /// <returns>Returns True = Visible or False = Not Visible.</returns>
+        internal bool GetIsInformationPanelVisible()
+        {
+            return informationPanelToolStripMenuItem.Checked;
+        }
+        /// <summary>
+        ///         Sets whether the text to speech should be turned on or off
+        /// </summary>
+        /// <param name="active">True = TTS Active. False = TTS Not Active.</param>
+        internal void SetTextToSpeech(bool active)
+        {
+            speakToolStripMenuItem.Checked = active;
+        }
+
+        /// <summary>
+        ///         Sets whether the information panel should be visible or not.
+        /// </summary>
+        /// <param name="active">True = Visible. False = Not Visible</param>
+        internal void SetInformationPanelVisible(bool active)
+        {
+            informationPanelToolStripMenuItem.Checked = active;
         }
     }
 }

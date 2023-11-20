@@ -123,7 +123,7 @@ namespace Assignment1
                     UpdatePlayerTotals(1, 0);
 
                     // If speech synthesis is on, say the tile which has been taken
-                    if (boardForm.IsTextToSpeechActive())
+                    if (boardForm.GetIsTextToSpeechActive())
                     {
                         // Add 1 to each due to 0 indexing
                         boardForm.speechSynth!.Speak("Player" + (player + 1).ToString() + " has placed a token at " + (rowClicked + 1).ToString() + " " + (colClicked + 1).ToString());
@@ -144,7 +144,7 @@ namespace Assignment1
             {
 
                 // Speech if required
-                if (boardForm!.IsTextToSpeechActive())
+                if (boardForm!.GetIsTextToSpeechActive())
                 {
                     boardForm.speechSynth!.Speak("No valid tiles, swapping player.");
                 }
@@ -156,7 +156,7 @@ namespace Assignment1
                 if (GetValidTiles().Count <= 0)
                 {
                     // Speech if required
-                    if (boardForm.IsTextToSpeechActive())
+                    if (boardForm.GetIsTextToSpeechActive())
                     {
                         boardForm.speechSynth!.Speak("No more valid tiles for either players.");
                     }
@@ -204,7 +204,7 @@ namespace Assignment1
                 if (whiteTiles > blackTiles)
                 {
                     // Speech if required
-                    if (boardForm!.IsTextToSpeechActive())
+                    if (boardForm!.GetIsTextToSpeechActive())
                     {
                         boardForm.speechSynth!.Speak("Game over, White wins!");
                     }
@@ -214,7 +214,7 @@ namespace Assignment1
                 else
                 {
                     // Speech if required
-                    if (boardForm!.IsTextToSpeechActive())
+                    if (boardForm!.GetIsTextToSpeechActive())
                     {
                         boardForm.speechSynth!.Speak("Game over, Black wins!");
                     }
@@ -496,6 +496,11 @@ namespace Assignment1
                 // Get the player totals to display to screen
                 GetPlayerTotals();
 
+                // Set the settings of the game to the saved value
+                boardForm.SetInformationPanelVisible(saveGames[indexToLoad].isInformationPanelVisible);
+                boardForm.SetTextToSpeech(saveGames[indexToLoad].isSpeechActivated);
+
+
                 // Loading an active game so names shouldn't be editable
                 boardForm.SetPlayerNameAccessibility(false);
 
@@ -522,7 +527,7 @@ namespace Assignment1
             if (nameExists)
             {
                 // Speech if required
-                if (boardForm!.IsTextToSpeechActive())
+                if (boardForm!.GetIsTextToSpeechActive())
                 {
                     boardForm.speechSynth!.Speak("Warning, game name already exists. Do you want to overwrite it?");
                 }
@@ -549,7 +554,7 @@ namespace Assignment1
                 string[] playerNames = boardForm!.GetPlayerNames();
 
                 // Create a new SaveGame object with the new data 
-                SaveGame newSave = new(saveName, playerNames[0], playerNames[1], gameData, player);
+                SaveGame newSave = new(saveName, playerNames[0], playerNames[1], gameData, player, boardForm.GetIsTextToSpeechActive(), boardForm.GetIsInformationPanelVisible());
 
                 // Serialise and append this data to the save game file
                 File.AppendAllText(saveDataDirPath, newSave.Serialise() + "\n");
