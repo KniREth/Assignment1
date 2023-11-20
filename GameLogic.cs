@@ -379,6 +379,8 @@ namespace Assignment1
                     saveGames[i].player1Name = playerNames[0];
                     saveGames[i].player2Name = playerNames[1];
                     saveGames[i].playerTurn = player;
+                    saveGames[i].isSpeechActivated = boardForm.GetIsTextToSpeechActive();
+                    saveGames[i].isInformationPanelVisible = boardForm.GetIsInformationPanelVisible();
                     for (int j = 0; j < gameValueData!.GetLength(0); j++)
                     {
                         for (int x = 0; x < gameValueData.GetLength(1); x++)
@@ -473,8 +475,26 @@ namespace Assignment1
         ///         Loads the game at the specified index into the current instance.
         /// </summary>
         /// <param name="indexToLoad">The index of the save in the save file to load.</param>
-        internal void LoadGame(int indexToLoad)
+        internal void LoadGame(string saveName)
         {
+
+            // Initialising a default value for indexToLoad, if not changed, the game will not be loaded
+            int indexToLoad = -1;
+
+            // Iterates through all of the objects in the saveGames list
+            for (int i = 0; i < saveGames.Count; i++)
+            {
+                // Check if the object's saveName is equal to the sender object's name
+                if (saveGames[i].saveName == saveName)
+                {
+                    // Set the index to load as the current index, this will mean the save game is found
+                    // This means that you can break out of the for loop as there shouldn't be any games with the same saveName
+                    indexToLoad = i;
+                    break;
+
+                }
+            }
+
             // Check if the index is valid
             if (indexToLoad >= 0)
             {

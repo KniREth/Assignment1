@@ -286,25 +286,13 @@ namespace Assignment1
         /// <param name="e"></param>
         private void LoadGame_Click(object sender, EventArgs e)
         {
-            // Initialising a default value for indexToLoad, if not changed, the game will not be loaded
-            int indexToLoad = -1;
-
-            // Iterates through all of the objects in the saveGames list
-            for (int i = 0; i < gameLogic.saveGames.Count; i++)
+            string? saveName = sender.ToString();
+            if (saveName != null)
             {
-                // Check if the object's saveName is equal to the sender object's name
-                if (gameLogic.saveGames[i].saveName == sender.ToString())
-                {
-                    // Set the index to load as the current index, this will mean the save game is found
-                    // This means that you can break out of the for loop as there shouldn't be any games with the same saveName
-                    indexToLoad = i;
-                    break;
-
-                }
+                // Load the game at the valid index if it is valid
+                gameLogic.LoadGame(saveName);
             }
             
-            // Load the game at the valid index if it is valid
-            gameLogic.LoadGame(indexToLoad);
 
         }
 
@@ -553,6 +541,7 @@ namespace Assignment1
         /// <param name="active">True = TTS Active. False = TTS Not Active.</param>
         internal void SetTextToSpeech(bool active)
         {
+            MessageBox.Show(active.ToString());
             speakToolStripMenuItem.Checked = active;
         }
 
