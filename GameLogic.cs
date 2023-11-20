@@ -41,8 +41,6 @@ namespace Assignment1
         readonly GameboardImageArray? gameGUIData;
         int[,]? gameValueData;
 
-        private bool isGameSaved = false;
-
         readonly BoardForm? boardForm;
 
         // Constructor for class
@@ -108,7 +106,7 @@ namespace Assignment1
                                 moveCheck = true;
 
                                 // The game instance is changing, so therefore isn't saved.
-                                isGameSaved = false;
+                                boardForm.isGameSaved = false;
                             }
 
                         }
@@ -393,7 +391,7 @@ namespace Assignment1
                 File.AppendAllText(saveDataDirPath, saveGames[i].Serialise() + "\n");
             }
             // Game has just been saved, so set isGameSaved as true
-            isGameSaved = true;
+            boardForm.isGameSaved = true;
 
             // Load all of the new save games back to the menu
             GetSaveGames();
@@ -509,7 +507,7 @@ namespace Assignment1
                 boardForm.SetPlayerNameAccessibility(false);
 
                 // This game has just been loaded, so is saved, therefore set isGameSaved as true
-                isGameSaved = true;
+                boardForm.isGameSaved = true;
             }
         }
 
@@ -568,7 +566,7 @@ namespace Assignment1
                 // Serialise and append this data to the save game file
                 File.AppendAllText(saveDataDirPath, newSave.Serialise() + "\n");
 
-                isGameSaved = true;
+                boardForm.isGameSaved = true;
             }
             
         }

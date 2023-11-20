@@ -23,7 +23,7 @@ namespace Assignment1
         const int numCols = 8;
 
         // boolean to check whether game has been saved when user tries to leave game
-        readonly bool isGameSaved = false;
+        internal bool isGameSaved = false;
 
         // Valid tiles for each player
         List<Point> validTiles = new();
