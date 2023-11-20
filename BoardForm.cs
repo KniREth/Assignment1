@@ -238,8 +238,6 @@ namespace Assignment1
 
         /// <summary>
         ///     Event handler for when the player presses to save the current game.
-        ///     Checks there is not too many saves and whether the current save name is already taken.
-        ///     If so, prompt to overwrite. Otherwise, save to new save slot.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -282,7 +280,7 @@ namespace Assignment1
         }
 
         /// <summary>
-        ///         Loads the game at the index which shares a saveName with the sender.ToString().
+        ///         Event handler for when the user presses the load game button.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -428,9 +426,6 @@ namespace Assignment1
                 if (result == DialogResult.No) { e.Cancel = true; }
             }
         }
-        
-
-
 
         /// <summary>
         ///         Setter function for the label which displays the total for each player. 
@@ -443,6 +438,7 @@ namespace Assignment1
             lblP1Val.Text = totalP1 + " x";
             lblP2Val.Text = totalP2 + " x";
         }
+
         /// <summary>
         ///         Setter function for whether the players should be able to 
         ///         edit their name in the text box.
@@ -454,6 +450,7 @@ namespace Assignment1
             txtBoxP1Name.Enabled = enabled;
             txtBoxP2Name.Enabled = enabled;
         }
+
         /// <summary>
         ///         Getter function for the names that the players enter into the text box.
         /// </summary>
@@ -463,6 +460,7 @@ namespace Assignment1
             // Returns the value stored in the text box for each player.
             return new string[] {txtBoxP1Name.Text, txtBoxP2Name.Text};
         }
+
         /// <summary>
         ///         Setter function for the text box holding the player names.
         /// </summary>
@@ -474,6 +472,7 @@ namespace Assignment1
             txtBoxP1Name.Text = player1Name;
             txtBoxP2Name.Text = player2Name;
         }
+
         /// <summary>
         ///         Clear the items which are displayed in the drop down menus for overwriteSaveToolStripMenuItem 
         ///         and loadGameToolStripMenuItem.DropDownItems
@@ -484,6 +483,7 @@ namespace Assignment1
             loadGameToolStripMenuItem.DropDownItems.Clear();
             overwriteSaveToolStripMenuItem.DropDownItems.Clear();
         }
+
         /// <summary>
         ///         Set whether the menu item should be visible or not for the load game button 
         ///         and the overwrite save button. This should be set as false if there is no current save games.
@@ -546,6 +546,7 @@ namespace Assignment1
         {
             return informationPanelToolStripMenuItem.Checked;
         }
+
         /// <summary>
         ///         Sets whether the text to speech should be turned on or off
         /// </summary>

@@ -45,6 +45,7 @@ namespace Assignment1
 
         readonly BoardForm? boardForm;
 
+        // Constructor for class
         public GameLogic(GameboardImageArray gameGUIData, BoardForm boardForm) 
         {
             try
@@ -470,9 +471,12 @@ namespace Assignment1
             boardForm!.SetPlayerTotalString(whiteTiles.ToString(), blackTiles.ToString());
         }
 
+        /// <summary>
+        ///         Loads the game at the specified index into the current instance.
+        /// </summary>
+        /// <param name="indexToLoad">The index of the save in the save file to load.</param>
         internal void LoadGame(int indexToLoad)
         {
-            MessageBox.Show("Loading game");
             // Check if the index is valid
             if (indexToLoad >= 0)
             {
@@ -509,6 +513,11 @@ namespace Assignment1
             }
         }
 
+        /// <summary>
+        ///         Checks there is not too many saves and whether the current save name is already taken.
+        ///         If so, prompt to overwrite. Otherwise, save to new save slot.
+        /// </summary>
+        /// <param name="saveName">String value of the name to give to the save game</param>
         internal void CreateNewSave(string saveName)
         {
             // Initialise boolean for whether the save name currently exists. 
