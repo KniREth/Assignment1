@@ -40,6 +40,15 @@ namespace Assignment1
         internal readonly SpeechSynthesizer? speechSynth;
         internal readonly string[]? voices;
 
+
+
+        public delegate void MenuItemClickedEventDelegate(object sender, EventArgs e);
+        public event MenuItemClickedEventDelegate? SaveButtonClicked;
+        public event MenuItemClickedEventDelegate? LoadButtonClicked;
+        public event MenuItemClickedEventDelegate? OverwriteButtonClicked;
+        public event MenuItemClickedEventDelegate? NewGameButtonClicked;
+
+
         public BoardForm()
         {
             InitializeComponent();
@@ -155,6 +164,8 @@ namespace Assignment1
 
             gameLogic.CheckPath(rowClicked, colClicked);
 
+
+            // TODO: Move this to the game logic class function for check path
             if (gameLogic.CheckGameOver() || gameLogic.CheckStalemate())
             {
                 // Speech if required
@@ -220,19 +231,9 @@ namespace Assignment1
         /// <param name="e"></param>
         private void NewGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Speech if required
-            if (speakToolStripMenuItem.Checked)
-            {
-                speechSynth!.Speak("Warning, any unsaved progress will be lost. Do you want to continue?");
-            }
-
-            // Prompt the user that they will lose unsaved data if they continue
-            DialogResult choice = MessageBox.Show("Warning, any unsaved progress will be lost.\nContinue?", "New Game", MessageBoxButtons.YesNo);
-
-            // Check if the user presses to continue
-            if (choice == DialogResult.Yes)
-            {
-                gameLogic.ResetMap();
+            if (this != null) 
+            { 
+                NewGameButtonClicked!(sender, e);
             }
         }
 
@@ -243,40 +244,10 @@ namespace Assignment1
         /// <param name="e"></param>
         private void SaveGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Check how many saveGame objects there as there can only be 5 save slots in the requirements
-            if (gameLogic.saveGames.Count < 5)
+            if (this != null)
             {
-                // The default name for the save game, this ensures it will be unique everytime
-                string defaultSaveName = DateTime.Now.ToString();
-
-                // Speech if required
-                if (speakToolStripMenuItem.Checked)
-                {
-                    speechSynth!.Speak("Enter name of save game.");
-                }
-
-                // Display a message box for the player to choose the name of their save game
-                string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save Game", defaultSaveName);
-
-                // If the player presses the cancel button, this will return false, otherwise it will continue with
-                // the default value from the input box
-                if (!String.IsNullOrEmpty(saveName))
-                {
-                    gameLogic.CreateNewSave(saveName);
-                }
+                SaveButtonClicked!(sender, e);
             }
-            else
-            {
-                // Speech if required
-                if (speakToolStripMenuItem.Checked)
-                {
-                    speechSynth!.Speak("You can only have 5 save game slots, choose a game to overwrite.");
-                }
-                MessageBox.Show("You can only have 5 save game slots, choose a game to overwrite.");
-            }
-
-            // Load the save games to the menu
-            gameLogic.GetSaveGames();
         }
 
         /// <summary>
@@ -286,14 +257,10 @@ namespace Assignment1
         /// <param name="e"></param>
         private void LoadGame_Click(object sender, EventArgs e)
         {
-            string? saveName = sender.ToString();
-            if (saveName != null)
+            if (this != null)
             {
-                // Load the game at the valid index if it is valid
-                gameLogic.LoadGame(saveName);
+                LoadButtonClicked!(sender, e);               
             }
-            
-
         }
 
         /// <summary>
@@ -301,42 +268,9 @@ namespace Assignment1
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void HandlerOverwriteSave(object sender, EventArgs e)
-        {
-            // The default name for the save game, this ensures it will be unique everytime
-            string defaultSaveName = DateTime.Now.ToString();
-
-            // Speech if required
-            if (speakToolStripMenuItem.Checked)
-            {
-                speechSynth!.Speak("Enter name of save game.");
-            }
-
-            // Display a message box for the player to choose the name of their save game
-            string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save Game", defaultSaveName);
-
-            // If the player presses the cancel button, this will return false, otherwise it will continue with
-            // the default value from the input box
-            if (!String.IsNullOrEmpty(saveName))
-            {
-                // Iterate through all of the current saveGame objects, and check if the current saveName is taken
-                for (int i = 0; i < gameLogic.saveGames.Count; i++)
-                {
-                    if (gameLogic.saveGames[i].saveName == saveName)
-                    {
-                        // Speech if required
-                        if (speakToolStripMenuItem.Checked)
-                        {
-                            speechSynth!.Speak("Save name already exists, setting name as default name.");
-                        }
-                        MessageBox.Show("Save name already exists, setting name as default name");
-                        saveName = defaultSaveName;
-                        break;
-                    }
-                }
-                gameLogic.OverwriteSave(sender.ToString()!, saveName);
-            }
-
+        private void OverwriteSave_Click(object sender, EventArgs e)
+        {                
+            OverwriteButtonClicked!(sender, e);
         }
 
         /// <summary>
@@ -503,7 +437,7 @@ namespace Assignment1
             loadGameToolStripMenuItem.DropDownItems[index].Click += new EventHandler(LoadGame_Click!);
 
             // Event handler for overwrite save game
-            overwriteSaveToolStripMenuItem.DropDownItems[index].Click += new EventHandler(HandlerOverwriteSave!);
+            overwriteSaveToolStripMenuItem.DropDownItems[index].Click += new EventHandler(OverwriteSave_Click!);
         }
 
         /// <summary>
@@ -541,7 +475,6 @@ namespace Assignment1
         /// <param name="active">True = TTS Active. False = TTS Not Active.</param>
         internal void SetTextToSpeech(bool active)
         {
-            MessageBox.Show(active.ToString());
             speakToolStripMenuItem.Checked = active;
         }
 

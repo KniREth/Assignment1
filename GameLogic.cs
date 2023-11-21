@@ -59,10 +59,49 @@ namespace Assignment1
             {
                 this.boardForm = boardForm;
                 gameValueData = boardForm.gameValueData;
+                boardForm.SaveButtonClicked += new BoardForm.MenuItemClickedEventDelegate(CreateNewSaveDelegate);
+                boardForm.LoadButtonClicked += new BoardForm.MenuItemClickedEventDelegate(LoadGameDelegate);
+                boardForm.OverwriteButtonClicked += new BoardForm.MenuItemClickedEventDelegate(OverwriteSaveDelegate);
+                boardForm.NewGameButtonClicked += new BoardForm.MenuItemClickedEventDelegate(ResetMapDelegate);
             }
             catch (Exception ex)
             {
                 _ = MessageBox.Show(ex.ToString(), "Cannot load board form", MessageBoxButtons.OK);
+            }
+        }
+
+        private void CreateNewSaveDelegate(object sender, EventArgs e)
+        {
+            CreateNewSave();
+        }
+
+        private void LoadGameDelegate(object sender, EventArgs e)
+        {
+            string? saveName = sender.ToString();
+            if (saveName != null) { LoadGame(saveName); }
+        }
+
+        private void OverwriteSaveDelegate(object sender, EventArgs e)
+        {
+            string? saveToOverwrite = sender.ToString();
+            if (saveToOverwrite != null) { OverwriteSave(saveToOverwrite); }
+        }
+
+        private void ResetMapDelegate(object sender, EventArgs e)
+        {
+            // Speech if required
+            if (boardForm!.GetIsTextToSpeechActive())
+            {
+                boardForm.speechSynth!.Speak("Warning, any unsaved progress will be lost. Do you want to continue?");
+            }
+
+            // Prompt the user that they will lose unsaved data if they continue
+            DialogResult choice = MessageBox.Show("Warning, any unsaved progress will be lost.\nContinue?", "New Game", MessageBoxButtons.YesNo);
+
+            // Check if the user presses to continue
+            if (choice == DialogResult.Yes)
+            {
+                ResetMap();
             }
         }
 
@@ -362,41 +401,75 @@ namespace Assignment1
         ///         Deletes all data in the save game file and rewrite all data with changes.
         /// </summary>
         /// <param name="saveName">The name of the save to overwrite</param>
-        internal void OverwriteSave(string saveName, string newSaveName)
+        internal void OverwriteSave(string saveToOverwrite)
         {
-            // Delete the initial file
-            File.Delete(saveDataDirPath);
+            // The default name for the save game, this ensures it will be unique everytime
+            string defaultSaveName = DateTime.Now.ToString();
 
-            string[] playerNames = boardForm!.GetPlayerNames();
-
-            // Iterate through all of the SaveGame objects in the list
-            for (int i = 0; i < saveGames.Count; i++)
+            // Speech if required
+            if (boardForm!.GetIsTextToSpeechActive())
             {
-                // If the saveGame object's saveName is the same as the param, overwrite that object
-                if (saveGames[i].saveName == saveName)
+                boardForm.speechSynth!.Speak("Enter name of save game.");
+            }
+
+            // Display a message box for the player to choose the name of their save game
+            string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save Game", defaultSaveName);
+
+            // If the player presses the cancel button, this will return false, otherwise it will continue with
+            // the default value from the input box
+            if (!String.IsNullOrEmpty(saveName))
+            {
+                // Iterate through all of the current saveGame objects, and check if the current saveName is taken
+                for (int i = 0; i < saveGames.Count; i++)
                 {
-                    saveGames[i].saveName = newSaveName;
-                    saveGames[i].player1Name = playerNames[0];
-                    saveGames[i].player2Name = playerNames[1];
-                    saveGames[i].playerTurn = player;
-                    saveGames[i].isSpeechActivated = boardForm.GetIsTextToSpeechActive();
-                    saveGames[i].isInformationPanelVisible = boardForm.GetIsInformationPanelVisible();
-                    for (int j = 0; j < gameValueData!.GetLength(0); j++)
+                    if (saveGames[i].saveName == saveName)
                     {
-                        for (int x = 0; x < gameValueData.GetLength(1); x++)
+                        // Speech if required
+                        if (boardForm.GetIsTextToSpeechActive())
                         {
-                            saveGames[i].gameData[j][x] = gameValueData[j, x];
+                            boardForm.speechSynth!.Speak("Save name already exists, setting name as default name.");
                         }
+                        MessageBox.Show("Save name already exists, setting name as default name");
+                        saveName = defaultSaveName;
+                        break;
                     }
                 }
-                // Rewrite the file with all new objects
-                File.AppendAllText(saveDataDirPath, saveGames[i].Serialise() + "\n");
-            }
-            // Game has just been saved, so set isGameSaved as true
-            boardForm.isGameSaved = true;
 
-            // Load all of the new save games back to the menu
-            GetSaveGames();
+                // Delete the initial file
+                File.Delete(saveDataDirPath);
+
+                string[] playerNames = boardForm!.GetPlayerNames();
+
+                // Iterate through all of the SaveGame objects in the list
+                for (int i = 0; i < saveGames.Count; i++)
+                {
+                    // If the saveGame object's saveName is the same as the param, overwrite that object
+                    if (saveGames[i].saveName == saveToOverwrite)
+                    {
+                        saveGames[i].saveName = saveName;
+                        saveGames[i].player1Name = playerNames[0];
+                        saveGames[i].player2Name = playerNames[1];
+                        saveGames[i].playerTurn = player;
+                        saveGames[i].isSpeechActivated = boardForm.GetIsTextToSpeechActive();
+                        saveGames[i].isInformationPanelVisible = boardForm.GetIsInformationPanelVisible();
+                        for (int j = 0; j < gameValueData!.GetLength(0); j++)
+                        {
+                            for (int x = 0; x < gameValueData.GetLength(1); x++)
+                            {
+                                saveGames[i].gameData[j][x] = gameValueData[j, x];
+                            }
+                        }
+                    }
+                    // Rewrite the file with all new objects
+                    File.AppendAllText(saveDataDirPath, saveGames[i].Serialise() + "\n");
+                }
+                // Game has just been saved, so set isGameSaved as true
+                boardForm.isGameSaved = true;
+
+                // Load all of the new save games back to the menu
+                GetSaveGames();
+
+            }
         }
 
         /// <summary>
@@ -477,7 +550,6 @@ namespace Assignment1
         /// <param name="indexToLoad">The index of the save in the save file to load.</param>
         internal void LoadGame(string saveName)
         {
-
             // Initialising a default value for indexToLoad, if not changed, the game will not be loaded
             int indexToLoad = -1;
 
@@ -536,58 +608,84 @@ namespace Assignment1
         ///         If so, prompt to overwrite. Otherwise, save to new save slot.
         /// </summary>
         /// <param name="saveName">String value of the name to give to the save game</param>
-        internal void CreateNewSave(string saveName)
+        internal void CreateNewSave()
         {
+
             // Initialise boolean for whether the save name currently exists. 
             bool nameExists = false;
 
-            // Iterate through all of the current saveGame objects, and check if the current saveName is taken
-            for (int i = 0; i < saveGames.Count; i++)
-            {
-                if (saveGames[i].saveName == saveName)
-                {
-                    nameExists = true;
-                }
-            }
 
-            // If the current save name exists, prompt the user to overwrite the save
-            if (nameExists)
+            // Check how many saveGame objects there as there can only be 5 save slots in the requirements
+            if (saveGames.Count < 5)
+            {
+                // The default name for the save game, this ensures it will be unique everytime
+                string defaultSaveName = DateTime.Now.ToString();
+
+                // Speech if required
+                if (boardForm!.GetIsTextToSpeechActive())
+                {
+                    boardForm.speechSynth!.Speak("Enter name of save game.");
+                }
+
+                // Display a message box for the player to choose the name of their save game
+                string saveName = Microsoft.VisualBasic.Interaction.InputBox("Enter name of save", "Save Game", defaultSaveName);
+
+                // If the player presses the cancel button, this will return false, otherwise it will continue with
+                // the default value from the input box
+                if (!String.IsNullOrEmpty(saveName))
+                {
+                    // Iterate through all of the current saveGame objects, and check if the current saveName is taken
+                    for (int i = 0; i < saveGames.Count; i++)
+                    {
+                        if (saveGames[i].saveName == saveName)
+                        {
+                            nameExists = true;
+                        }
+                    }
+
+                    // If the save name doesn't exist, save the game to a new slot
+                    if (!nameExists)
+                    {
+                        // Create a jagged array as 2d arrays cannot be serialised using this serialiser
+                        int[][] gameData = new int[8][];
+
+                        // Copy the data from gameboard data to the new jagged array
+                        for (int i = 0; i < gameValueData!.GetLength(0); i++)
+                        {
+                            gameData[i] = new int[8];
+                            for (int j = 0; j < gameValueData.GetLength(1); j++)
+                            {
+                                gameData[i][j] = gameValueData[i, j];
+                            }
+                        }
+
+                        string[] playerNames = boardForm!.GetPlayerNames();
+
+                        // Create a new SaveGame object with the new data 
+                        SaveGame newSave = new(saveName, playerNames[0], playerNames[1], gameData, player, boardForm.GetIsTextToSpeechActive(), boardForm.GetIsInformationPanelVisible());
+
+                        // Serialise and append this data to the save game file
+                        File.AppendAllText(saveDataDirPath, newSave.Serialise() + "\n");
+
+                        boardForm.isGameSaved = true;
+                    }
+                }
+
+                // Load the save games to the menu
+                GetSaveGames();
+            }
+            else
             {
                 // Speech if required
                 if (boardForm!.GetIsTextToSpeechActive())
                 {
-                    boardForm.speechSynth!.Speak("Warning, game name already exists. Do you want to overwrite it?");
+                    boardForm.speechSynth!.Speak("You can only have 5 save game slots, choose a game to overwrite.");
                 }
-                DialogResult choice = MessageBox.Show("Warning, game name already exists.\nOverwrite??", "Game Exists", MessageBoxButtons.YesNo);
-                if (choice == DialogResult.Yes) { OverwriteSave(saveName, saveName); }
+                MessageBox.Show("You can only have 5 save game slots, choose a game to overwrite.");
             }
 
-            // If the save name doesn't exist, save the game to a new slot
-            else
-            {
-                // Create a jagged array as 2d arrays cannot be serialised using this serialiser
-                int[][] gameData = new int[8][];
 
-                // Copy the data from gameboard data to the new jagged array
-                for (int i = 0; i < gameValueData!.GetLength(0); i++)
-                {
-                    gameData[i] = new int[8];
-                    for (int j = 0; j < gameValueData.GetLength(1); j++)
-                    {
-                        gameData[i][j] = gameValueData[i, j];
-                    }
-                }
-
-                string[] playerNames = boardForm!.GetPlayerNames();
-
-                // Create a new SaveGame object with the new data 
-                SaveGame newSave = new(saveName, playerNames[0], playerNames[1], gameData, player, boardForm.GetIsTextToSpeechActive(), boardForm.GetIsInformationPanelVisible());
-
-                // Serialise and append this data to the save game file
-                File.AppendAllText(saveDataDirPath, newSave.Serialise() + "\n");
-
-                boardForm.isGameSaved = true;
-            }
+            
             
         }
     }
