@@ -25,8 +25,7 @@ namespace Assignment1
         // boolean to check whether game has been saved when user tries to leave game
         internal bool isGameSaved = false;
 
-        // Valid tiles for each player
-        List<Point> validTiles = new();
+        
 
         // Initialise an array of pic boxes for board
         readonly GameboardImageArray? gameGUIData;
@@ -34,7 +33,7 @@ namespace Assignment1
         readonly string tileImagesDirPath = Directory.GetCurrentDirectory() + @"\images\";
 
         // New game logic class
-        readonly GameLogic gameLogic;
+        readonly GameLogic? gameLogic;
 
         // Initialise speech synthesis and the string array of voices for use by different players
         internal readonly SpeechSynthesizer? speechSynth;
@@ -47,6 +46,7 @@ namespace Assignment1
         public event MenuItemClickedEventDelegate? LoadButtonClicked;
         public event MenuItemClickedEventDelegate? OverwriteButtonClicked;
         public event MenuItemClickedEventDelegate? NewGameButtonClicked;
+        public event MenuItemClickedEventDelegate? GameboardTileClicked;
 
 
         public BoardForm()
@@ -88,8 +88,6 @@ namespace Assignment1
                 DialogResult result = MessageBox.Show(ex.ToString(), "Cannot fetch save games");
                 this.Close();
             }
-
-            validTiles = gameLogic!.GetValidTiles();
 
             try
             {
@@ -143,60 +141,17 @@ namespace Assignment1
         }
 
         /// <summary>
-        ///         When the player clicks a tile, it will ensure they cannot change their names as the
-        ///         game has now started and if they haven't yet entered a name they will have it set to default. 
-        ///         It will also then send the row and col to CheckPath to change the tile if it is valid.
-        ///         It will then check if the game is over and if so give the option to start a new game.
+        ///         Event hanlder for when the player clicks a game tile.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void GameTileClicked(object sender, EventArgs e)
         {
-
-
-            // Set the row and col into variables for readability
-            int rowClicked = gameGUIData!.GetCurrentRowIndex(sender);
-            int colClicked = gameGUIData!.GetCurrentColumnIndex(sender);
-
             // If either of the player hasn't entered a name, give them a default name
             if (!p1NameEntered) { txtBoxP1Name.Text = "Player #1"; }
             if (!p2NameEntered) { txtBoxP2Name.Text = "Player #2"; }
 
-            gameLogic.CheckPath(rowClicked, colClicked);
-
-
-            // TODO: Move this to the game logic class function for check path
-            if (gameLogic.CheckGameOver() || gameLogic.CheckStalemate())
-            {
-                // Speech if required
-                if (speakToolStripMenuItem.Checked)
-                {
-                    speechSynth!.Speak("Start a new game?");
-                }
-
-                // Prompt the user that they will lose unsaved data if they continue
-                DialogResult choice = MessageBox.Show("Start a new game?", "New Game", MessageBoxButtons.YesNo);
-
-
-                // Check if the user presses to continue
-                if (choice == DialogResult.Yes)
-                {
-                    gameLogic.ResetMap();
-                }
-            }
-
-            // Clear valid tiles so that they can be reset 
-            for (int y = 0; y < validTiles.Count; y++)
-            {
-                if (Path.GetFileNameWithoutExtension(gameGUIData.GetTile(validTiles[y].X, validTiles[y].Y).ImageLocation) == "Available")
-                {
-                    gameGUIData.SetTile(validTiles[y].X, validTiles[y].Y, "10");
-                }
-            }
-
-            // Get all of the valid tiles for the player
-            validTiles = gameLogic.GetValidTiles();
-
+            GameboardTileClicked!(sender, e);
         }  
 
         /// <summary>

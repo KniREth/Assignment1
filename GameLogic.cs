@@ -18,6 +18,9 @@ namespace Assignment1
         int blackTiles = 2;
         int whiteTiles = 2;
 
+        // Valid tiles for each player
+        List<Point> validTiles = new();
+
         // All of the SaveGame objects which have been deserialised from the SaveGame.JSON file
         internal readonly List<SaveGame> saveGames = new();
 
@@ -63,11 +66,14 @@ namespace Assignment1
                 boardForm.LoadButtonClicked += new BoardForm.MenuItemClickedEventDelegate(LoadGameDelegate);
                 boardForm.OverwriteButtonClicked += new BoardForm.MenuItemClickedEventDelegate(OverwriteSaveDelegate);
                 boardForm.NewGameButtonClicked += new BoardForm.MenuItemClickedEventDelegate(ResetMapDelegate);
+                boardForm.GameboardTileClicked += new BoardForm.MenuItemClickedEventDelegate(GameTileClickedDelegate);
             }
             catch (Exception ex)
             {
                 _ = MessageBox.Show(ex.ToString(), "Cannot load board form", MessageBoxButtons.OK);
             }
+
+            GetValidTiles();
         }
 
         private void CreateNewSaveDelegate(object sender, EventArgs e)
@@ -105,13 +111,24 @@ namespace Assignment1
             }
         }
 
+        private void GameTileClickedDelegate(object sender, EventArgs e)
+        {
+            if (this != null)
+            {
+                // Set the row and col into variables for readability
+                int rowClicked = gameGUIData!.GetCurrentRowIndex(sender);
+                int colClicked = gameGUIData!.GetCurrentColumnIndex(sender);
+                CheckPath(rowClicked, colClicked);
+            }
+        }
+
         /// <summary>
         ///         When the player clicks on the tile, it checks if the current tile is valid and then
         ///         swaps all of the necessary tiles to the correct colour and updates the player totals.
         ///         It will then switch to the next player's turn.
         /// </summary>
-        /// <param name="rowClicked"></param>
-        /// <param name="colClicked"></param>
+        /// <param name="rowClicked">Integer value representing the row position clicked, 0 indexed.</param>
+        /// <param name="colClicked">Integer value representing the col position clicked, 0 indexed.</param>
         internal void CheckPath(int rowClicked, int colClicked)
         {
             // Flag to check whether values need to be updated
@@ -168,6 +185,38 @@ namespace Assignment1
                     }
                     SwapPlayer();
                 }
+
+                // TODO: Move this to the game logic class function for check path
+                if (CheckGameOver() || CheckStalemate())
+                {
+                    // Speech if required
+                    if (boardForm.GetIsTextToSpeechActive())
+                    {
+                        boardForm.speechSynth!.Speak("Start a new game?");
+                    }
+
+                    // Prompt the user that they will lose unsaved data if they continue
+                    DialogResult choice = MessageBox.Show("Start a new game?", "New Game", MessageBoxButtons.YesNo);
+
+
+                    // Check if the user presses to continue
+                    if (choice == DialogResult.Yes)
+                    {
+                        ResetMap();
+                    }
+                }
+
+                // Clear valid tiles so that they can be reset 
+                for (int y = 0; y < validTiles.Count; y++)
+                {
+                    if (Path.GetFileNameWithoutExtension(gameGUIData!.GetTile(validTiles[y].X, validTiles[y].Y).ImageLocation) == "Available")
+                    {
+                        gameGUIData.SetTile(validTiles[y].X, validTiles[y].Y, "10");
+                    }
+                }
+
+                // Get all of the valid tiles for the player
+                validTiles = GetValidTiles();
             }
         }
 
