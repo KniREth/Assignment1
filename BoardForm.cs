@@ -51,10 +51,14 @@ namespace Assignment1
         {
             InitializeComponent();
 
+            // Initialise the corners of the board for drawing its position
             Point topLeftCorner = new(50, 30);
             Point bottomRightCorner = new(50, 65);
+
+            // Initialise the board and get the current data of each tile
             gameValueData = InitialiseBoard();
 
+            // Try to load the gameboard image array with the data and position 
             try
             {
                 gameGUIData = new GameboardImageArray(this, gameValueData, topLeftCorner, bottomRightCorner, 0, tileImagesDirPath);
@@ -67,6 +71,7 @@ namespace Assignment1
                 this.Close();
             }
 
+            // Try to load the game's logic 
             try
             {
                 gameLogic = new GameLogic(gameGUIData!, this);
@@ -77,6 +82,7 @@ namespace Assignment1
                 this.Close();
             }
 
+            // Try to fetch the save game file
             try
             {
                 gameLogic!.GetSaveGames();
@@ -87,6 +93,7 @@ namespace Assignment1
                 this.Close();
             }
 
+            // Try to load the speech synthesizer for text to speech
             try
             {
                 speechSynth = new SpeechSynthesizer();
@@ -137,6 +144,8 @@ namespace Assignment1
 
             return boardArray;
         }
+
+        // Event handlers
 
         /// <summary>
         ///         Event hanlder for when the player clicks a game tile.
@@ -302,6 +311,42 @@ namespace Assignment1
             }
         }
 
+        
+
+
+        // Getter functions
+
+        /// <summary>
+        ///         Getter function for the names that the players enter into the text box.
+        /// </summary>
+        /// <returns>Returns the names of each player as a string array. [Player 1 Name, Player 2 Name].</returns>
+        internal string[] GetPlayerNames()
+        {
+            // Returns the value stored in the text box for each player.
+            return new string[] {txtBoxP1Name.Text, txtBoxP2Name.Text};
+        }
+
+        /// <summary>
+        ///         Getter function to check whether text to speech is activated or not.
+        /// </summary>
+        /// <returns>Returns a boolean of whether text to speech is checked. True = Active. False = Not Active.</returns>
+        internal bool GetIsTextToSpeechActive()
+        {
+            return speakToolStripMenuItem.Checked;
+        }
+
+        /// <summary>
+        ///         Checks whether the information panel is checked or not in the menu.
+        /// </summary>
+        /// <returns>Returns True = Visible or False = Not Visible.</returns>
+        internal bool GetIsInformationPanelVisible()
+        {
+            return informationPanelToolStripMenuItem.Checked;
+        }
+
+
+        // Setter functions
+
         /// <summary>
         ///         Setter function for the label which displays the total for each player. 
         /// </summary>
@@ -327,16 +372,6 @@ namespace Assignment1
         }
 
         /// <summary>
-        ///         Getter function for the names that the players enter into the text box.
-        /// </summary>
-        /// <returns>Returns the names of each player as a string array. [Player 1 Name, Player 2 Name].</returns>
-        internal string[] GetPlayerNames()
-        {
-            // Returns the value stored in the text box for each player.
-            return new string[] {txtBoxP1Name.Text, txtBoxP2Name.Text};
-        }
-
-        /// <summary>
         ///         Setter function for the text box holding the player names.
         /// </summary>
         /// <param name="player1Name">String value for the name of Player 1.</param>
@@ -349,17 +384,6 @@ namespace Assignment1
         }
 
         /// <summary>
-        ///         Clear the items which are displayed in the drop down menus for overwriteSaveToolStripMenuItem 
-        ///         and loadGameToolStripMenuItem.DropDownItems
-        /// </summary>
-        internal void ClearDropDownMenus()
-        {
-            // Clear menu dropdown items.
-            loadGameToolStripMenuItem.DropDownItems.Clear();
-            overwriteSaveToolStripMenuItem.DropDownItems.Clear();
-        }
-
-        /// <summary>
         ///         Set whether the menu item should be visible or not for the load game button 
         ///         and the overwrite save button. This should be set as false if there is no current save games.
         /// </summary>
@@ -369,6 +393,46 @@ namespace Assignment1
             // Set the visibility as the param entered.
             loadGameToolStripMenuItem.Visible = visible;
             overwriteSaveToolStripMenuItem.Visible = visible;
+        }
+
+        /// <summary>
+        ///         Setter function for the picture box which indicates the next player to move.
+        /// </summary>
+        /// <param name="player">Player determines which picture box should be displayed. Player 1 = Left, Player 2 = Right.</param>
+        internal void SetPlayerToMoveIcon(int player)
+        {
+            // Swap arrow img for next player move
+            if (player == 0) { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "left.PNG"; }
+            else { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "right.PNG"; }
+        }
+
+        /// <summary>
+        ///         Sets whether the text to speech should be turned on or off
+        /// </summary>
+        /// <param name="active">True = TTS Active. False = TTS Not Active.</param>
+        internal void SetTextToSpeech(bool active)
+        {
+            speakToolStripMenuItem.Checked = active;
+        }
+
+        /// <summary>
+        ///         Sets whether the information panel should be visible or not.
+        /// </summary>
+        /// <param name="active">True = Visible. False = Not Visible</param>
+        internal void SetInformationPanelVisible(bool active)
+        {
+            informationPanelToolStripMenuItem.Checked = active;
+        }
+
+        /// <summary>
+        ///         Clear the items which are displayed in the drop down menus for overwriteSaveToolStripMenuItem 
+        ///         and loadGameToolStripMenuItem.DropDownItems
+        /// </summary>
+        internal void ClearDropDownMenus()
+        {
+            // Clear menu dropdown items.
+            loadGameToolStripMenuItem.DropDownItems.Clear();
+            overwriteSaveToolStripMenuItem.DropDownItems.Clear();
         }
 
         /// <summary>
@@ -393,51 +457,5 @@ namespace Assignment1
             overwriteSaveToolStripMenuItem.DropDownItems[index].Click += new EventHandler(OverwriteSave_Click!);
         }
 
-        /// <summary>
-        ///         Setter function for the picture box which indicates the next player to move.
-        /// </summary>
-        /// <param name="player">Player determines which picture box should be displayed. Player 1 = Left, Player 2 = Right.</param>
-        internal void SetPlayerToMoveIcon(int player)
-        {
-            // Swap arrow img for next player move
-            if (player == 0) { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "left.PNG"; }
-            else { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "right.PNG"; }
-        }
-
-        /// <summary>
-        ///         Getter function to check whether text to speech is activated or not.
-        /// </summary>
-        /// <returns>Returns a boolean of whether text to speech is checked. True = Active. False = Not Active.</returns>
-        internal bool GetIsTextToSpeechActive()
-        {
-            return speakToolStripMenuItem.Checked;
-        }
-
-        /// <summary>
-        ///         Checks whether the information panel is checked or not in the menu.
-        /// </summary>
-        /// <returns>Returns True = Visible or False = Not Visible.</returns>
-        internal bool GetIsInformationPanelVisible()
-        {
-            return informationPanelToolStripMenuItem.Checked;
-        }
-
-        /// <summary>
-        ///         Sets whether the text to speech should be turned on or off
-        /// </summary>
-        /// <param name="active">True = TTS Active. False = TTS Not Active.</param>
-        internal void SetTextToSpeech(bool active)
-        {
-            speakToolStripMenuItem.Checked = active;
-        }
-
-        /// <summary>
-        ///         Sets whether the information panel should be visible or not.
-        /// </summary>
-        /// <param name="active">True = Visible. False = Not Visible</param>
-        internal void SetInformationPanelVisible(bool active)
-        {
-            informationPanelToolStripMenuItem.Checked = active;
-        }
     }
 }

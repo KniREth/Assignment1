@@ -27,7 +27,7 @@ namespace Assignment1
         // The directory for the save game file
         readonly string saveDataDirPath = Directory.GetCurrentDirectory() + @"\saves\game_data.JSON";
 
-        // Offsets are the tiles that surround the current tile
+        // List of points which represent the positions of all of the tiles that surround the current tile
         readonly List<Point> offsets = new()
         {
             new Point(-1, -1), // Diag up left
@@ -49,6 +49,7 @@ namespace Assignment1
         // Constructor for class
         public GameLogic(GameboardImageArray gameGUIData, BoardForm boardForm) 
         {
+            // Try to load the game gui which is passed through
             try
             {
                 this.gameGUIData = gameGUIData;
@@ -58,6 +59,7 @@ namespace Assignment1
                 _ = MessageBox.Show(ex.ToString(), "Cannot fetch GameGUIData", MessageBoxButtons.OK);
             }
 
+            // Try to load the board form and create new event delegates for the event handlers
             try
             {
                 this.boardForm = boardForm;
@@ -73,6 +75,7 @@ namespace Assignment1
                 _ = MessageBox.Show(ex.ToString(), "Cannot load board form", MessageBoxButtons.OK);
             }
 
+            // Display all of the initial valid tiles to the screen
             GetValidTiles();
         }
 
