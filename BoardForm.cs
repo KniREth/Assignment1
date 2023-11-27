@@ -12,6 +12,12 @@ using System.ComponentModel;
 
 namespace Assignment1
 {
+    /// <summary>
+    ///         This class represents the form which is displayed to the player. It acts as a "middle-man"
+    ///         between the game logic class and the gameboard image array class as an act of integrity.
+    ///         The board form will be able to get and set values which can be displayed onto the screen as
+    ///         well as listen for events from the user such as menu buttons being clicked or game tiles.
+    /// </summary>
     public partial class BoardForm : Form
     {
         #region Variable intialisation
@@ -152,7 +158,6 @@ namespace Assignment1
         }
 
         #endregion
-
 
         #region Event handlers
 

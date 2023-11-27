@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 
 namespace Assignment1
 {
+    /// <summary>
+    ///         This class represents all of the logic that is required to run the game. For example, checking
+    ///         if a move is valid, updating player values, resetting the map and being able to save or load a 
+    ///         game instance into the current game.
+    /// </summary>
     internal class GameLogic
     {
         #region Variable Initialisation
