@@ -76,23 +76,48 @@ namespace Assignment1
             GetValidTiles();
         }
 
+        /// <summary>
+        ///         When the user presses the save game button, the handler will call here 
+        ///         which will delegate to the CreateNewSave() function.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CreateNewSaveDelegate(object sender, EventArgs e)
         {
             CreateNewSave();
         }
 
+        /// <summary>
+        ///         When the user presses the Load game button, the handler will call this function which gets
+        ///         the save name to load and calls the LoadGame() function passing the necessary save name.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LoadGameDelegate(object sender, EventArgs e)
         {
             string? saveName = sender.ToString();
             if (saveName != null) { LoadGame(saveName); }
         }
 
+        /// <summary>
+        ///         When the user presses the overwrite save button, it will be called to here where it will
+        ///         delegate the event tot the OverwriteSave() fuction with the necessary save which needs to be 
+        ///         overwritten
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OverwriteSaveDelegate(object sender, EventArgs e)
         {
             string? saveToOverwrite = sender.ToString();
             if (saveToOverwrite != null) { OverwriteSave(saveToOverwrite); }
         }
 
+        /// <summary>
+        ///         When the user presses the reset map button, the event will be delegated to the ResetMap()
+        ///         function after the user is prompted to continue or not.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ResetMapDelegate(object sender, EventArgs e)
         {
             // Speech if required
@@ -111,6 +136,12 @@ namespace Assignment1
             }
         }
 
+        /// <summary>
+        ///         When the player clicks on a tile, it will call this function which will delegate the event to the
+        ///         CheckPath() function with the necessary row and col.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void GameTileClickedDelegate(object sender, EventArgs e)
         {
             if (this != null)

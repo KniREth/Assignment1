@@ -25,8 +25,6 @@ namespace Assignment1
         // boolean to check whether game has been saved when user tries to leave game
         internal bool isGameSaved = false;
 
-        
-
         // Initialise an array of pic boxes for board
         readonly GameboardImageArray? gameGUIData;
         internal int[,] gameValueData;
