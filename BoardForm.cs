@@ -14,6 +14,8 @@ namespace Assignment1
 {
     public partial class BoardForm : Form
     {
+        #region Variable intialisation
+
         // Initialise bool for player entering name into txt box
         bool p1NameEntered = false;
         bool p2NameEntered = false;
@@ -46,7 +48,11 @@ namespace Assignment1
         public event MenuItemClickedEventDelegate? NewGameButtonClicked;
         public event MenuItemClickedEventDelegate? GameboardTileClicked;
 
+        #endregion
 
+        #region Constructor
+
+        // Constructor for the class
         public BoardForm()
         {
             InitializeComponent();
@@ -145,7 +151,10 @@ namespace Assignment1
             return boardArray;
         }
 
-        // Event handlers
+        #endregion
+
+
+        #region Event handlers
 
         /// <summary>
         ///         Event hanlder for when the player clicks a game tile.
@@ -311,10 +320,9 @@ namespace Assignment1
             }
         }
 
-        
+        #endregion
 
-
-        // Getter functions
+        #region Getter functions
 
         /// <summary>
         ///         Getter function for the names that the players enter into the text box.
@@ -344,8 +352,9 @@ namespace Assignment1
             return informationPanelToolStripMenuItem.Checked;
         }
 
+        #endregion
 
-        // Setter functions
+        #region Setter Functions        
 
         /// <summary>
         ///         Setter function for the label which displays the total for each player. 
@@ -457,5 +466,6 @@ namespace Assignment1
             overwriteSaveToolStripMenuItem.DropDownItems[index].Click += new EventHandler(OverwriteSave_Click!);
         }
 
+        #endregion
     }
 }

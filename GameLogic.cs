@@ -11,6 +11,7 @@ namespace Assignment1
 {
     internal class GameLogic
     {
+        #region Variable Initialisation
         // Player 0 is white, player 1 is black. White plays first
         int player = 0;
 
@@ -46,6 +47,10 @@ namespace Assignment1
 
         readonly BoardForm? boardForm;
 
+        #endregion
+
+        #region Constructor
+
         // Constructor for class
         public GameLogic(GameboardImageArray gameGUIData, BoardForm boardForm) 
         {
@@ -78,6 +83,10 @@ namespace Assignment1
             // Display all of the initial valid tiles to the screen
             GetValidTiles();
         }
+
+        #endregion
+
+        #region Event Delegates
 
         /// <summary>
         ///         When the user presses the save game button, the handler will call here 
@@ -155,6 +164,10 @@ namespace Assignment1
                 CheckPath(rowClicked, colClicked);
             }
         }
+
+        #endregion
+
+        #region Tile checks
 
         /// <summary>
         ///         When the player clicks on the tile, it checks if the current tile is valid and then
@@ -255,99 +268,6 @@ namespace Assignment1
         }
 
         /// <summary>
-        ///         Checks if the current player has no moves, if so swap player and check the other player. 
-        ///         If the other player has no moves, game is stalemate
-        /// </summary>
-        internal bool CheckStalemate()
-        {
-            // If the player has no tiles left to choose from, but the game isn't over, switch players
-            if (GetValidTiles().Count <= 0 && !CheckGameOver())
-            {
-
-                // Speech if required
-                if (boardForm!.GetIsTextToSpeechActive())
-                {
-                    boardForm.speechSynth!.Speak("No valid tiles, swapping player.");
-                }
-
-                MessageBox.Show("No valid tiles, swapping player.");
-                SwapPlayer();
-
-                // If the other player is in the same situation, the game is ended
-                if (GetValidTiles().Count <= 0)
-                {
-                    // Speech if required
-                    if (boardForm.GetIsTextToSpeechActive())
-                    {
-                        boardForm.speechSynth!.Speak("No more valid tiles for either players.");
-                    }
-                    MessageBox.Show("No more valid tiles for either players.");
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 
-        /// The SwapPlayer function will take the current player and set it to the  remainder of the current player plus one 
-        /// divided by 2. 
-        /// For example, player = 1. Player + 1 = 2. 2 % 2 = 0. New player = 0.
-        /// player = 0. player + 1 = 1. 1 % 2 = 1. New player = 1.
-        /// 
-        /// This in my opinion is cleaner then checking and switching
-        /// 
-        /// The function will then swap the picbox image to show that it is the next player's move
-        /// 
-        /// </summary>
-        private void SwapPlayer()
-        {
-            // Swap to next player's turn
-            player = (player + 1) % 2;
-
-            boardForm!.SetPlayerToMoveIcon(player);
-            
-            // Set the speech synthesiser's voice to the specified player
-            boardForm.speechSynth!.SelectVoice(boardForm.voices![player]);
-        }
-
-        /// <summary>
-        /// 
-        /// Check whether the game is over by seeing if all of the tiles are taken by the players.
-        /// 
-        /// </summary>
-        internal bool CheckGameOver()
-        {
-            // Check game over, 8x8 grid = 64 tiles, if all are filled, game is over
-            if (blackTiles + whiteTiles >= 64)
-            {
-                // Check which player wins, whoever has most tiles
-                if (whiteTiles > blackTiles)
-                {
-                    // Speech if required
-                    if (boardForm!.GetIsTextToSpeechActive())
-                    {
-                        boardForm.speechSynth!.Speak("Game over, White wins!");
-                    }
-
-                    MessageBox.Show("Game over, White wins!");
-                }
-                else
-                {
-                    // Speech if required
-                    if (boardForm!.GetIsTextToSpeechActive())
-                    {
-                        boardForm.speechSynth!.Speak("Game over, Black wins!");
-                    }
-
-                    MessageBox.Show("Game over, Black wins!");
-                }
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
         ///     GetValidTiles iterates through the gameBoard and checks each position for its value.
         ///     If the value of the position is an empty square, then check if it is a valid tile for all of the offsets
         ///     If the tile is valid, add it's position to a list of Points and return.
@@ -438,6 +358,104 @@ namespace Assignment1
         }
 
         /// <summary>
+        ///         Checks if the current player has no moves, if so swap player and check the other player. 
+        ///         If the other player has no moves, game is stalemate
+        /// </summary>
+        internal bool CheckStalemate()
+        {
+            // If the player has no tiles left to choose from, but the game isn't over, switch players
+            if (GetValidTiles().Count <= 0 && !CheckGameOver())
+            {
+
+                // Speech if required
+                if (boardForm!.GetIsTextToSpeechActive())
+                {
+                    boardForm.speechSynth!.Speak("No valid tiles, swapping player.");
+                }
+
+                MessageBox.Show("No valid tiles, swapping player.");
+                SwapPlayer();
+
+                // If the other player is in the same situation, the game is ended
+                if (GetValidTiles().Count <= 0)
+                {
+                    // Speech if required
+                    if (boardForm.GetIsTextToSpeechActive())
+                    {
+                        boardForm.speechSynth!.Speak("No more valid tiles for either players.");
+                    }
+                    MessageBox.Show("No more valid tiles for either players.");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// 
+        /// Check whether the game is over by seeing if all of the tiles are taken by the players.
+        /// 
+        /// </summary>
+        internal bool CheckGameOver()
+        {
+            // Check game over, 8x8 grid = 64 tiles, if all are filled, game is over
+            if (blackTiles + whiteTiles >= 64)
+            {
+                // Check which player wins, whoever has most tiles
+                if (whiteTiles > blackTiles)
+                {
+                    // Speech if required
+                    if (boardForm!.GetIsTextToSpeechActive())
+                    {
+                        boardForm.speechSynth!.Speak("Game over, White wins!");
+                    }
+
+                    MessageBox.Show("Game over, White wins!");
+                }
+                else
+                {
+                    // Speech if required
+                    if (boardForm!.GetIsTextToSpeechActive())
+                    {
+                        boardForm.speechSynth!.Speak("Game over, Black wins!");
+                    }
+
+                    MessageBox.Show("Game over, Black wins!");
+                }
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
+
+        #region Player data
+
+        /// <summary>
+        /// 
+        /// The SwapPlayer function will take the current player and set it to the  remainder of the current player plus one 
+        /// divided by 2. 
+        /// For example, player = 1. Player + 1 = 2. 2 % 2 = 0. New player = 0.
+        /// player = 0. player + 1 = 1. 1 % 2 = 1. New player = 1.
+        /// 
+        /// This in my opinion is cleaner then checking and switching
+        /// 
+        /// The function will then swap the picbox image to show that it is the next player's move
+        /// 
+        /// </summary>
+        private void SwapPlayer()
+        {
+            // Swap to next player's turn
+            player = (player + 1) % 2;
+
+            boardForm!.SetPlayerToMoveIcon(player);
+            
+            // Set the speech synthesiser's voice to the specified player
+            boardForm.speechSynth!.SelectVoice(boardForm.voices![player]);
+        }
+
+        /// <summary>
         ///     Updates the retrospective total tiles for each player.
         ///     This will be showcased on the screen and also used to check whether the game is over.
         /// </summary>
@@ -463,6 +481,38 @@ namespace Assignment1
         }
 
         /// <summary>
+        ///         Looks through the game array to see how many tiles each player currently has
+        ///         and sets the variable storing the amount for each player. 
+        ///         Also sets the string which is displayed on the screen for each player's totals.
+        /// </summary>
+        internal void GetPlayerTotals()
+        {
+            whiteTiles = 0;
+            blackTiles = 0;
+            for (int i = 0; i < gameValueData!.GetLength(0); i++)
+            {
+                for (int j = 0; j < gameValueData.GetLength(1); j++)
+                {
+                    if (gameValueData[i, j] == 0)
+                    {
+                        whiteTiles += 1;
+                    }
+                    else if (gameValueData[i, j] == 1)
+                    {
+                        blackTiles += 1;
+                    }
+                }
+            }
+
+            // Update the display text for the totals of each player
+            boardForm!.SetPlayerTotalString(whiteTiles.ToString(), blackTiles.ToString());
+        }
+
+        #endregion
+
+        #region Resetting the map
+
+        /// <summary>
         ///         Resets all of the maps values to the base values so that the players can start again.
         /// </summary>
         internal void ResetMap()
@@ -479,6 +529,9 @@ namespace Assignment1
             boardForm.SetPlayerNameAccessibility(true);
         }
 
+        #endregion
+
+        #region Game storage
         /// <summary>
         ///         Rewrites all of the saves in the save file with the new data. 
         ///         Deletes all data in the save game file and rewrite all data with changes.
@@ -555,6 +608,7 @@ namespace Assignment1
             }
         }
 
+
         /// <summary>
         ///         Loads all of the save games onto the menu.
         ///         If a save file doesn't currently exist, create one.
@@ -597,34 +651,6 @@ namespace Assignment1
             {
                 boardForm.SetDropDownMenuVisibility(false);
             }
-        }
-
-        /// <summary>
-        ///         Looks through the game array to see how many tiles each player currently has
-        ///         and sets the variable storing the amount for each player. 
-        ///         Also sets the string which is displayed on the screen for each player's totals.
-        /// </summary>
-        internal void GetPlayerTotals()
-        {
-            whiteTiles = 0;
-            blackTiles = 0;
-            for (int i = 0; i < gameValueData!.GetLength(0); i++)
-            {
-                for (int j = 0; j < gameValueData.GetLength(1); j++)
-                {
-                    if (gameValueData[i, j] == 0)
-                    {
-                        whiteTiles += 1;
-                    }
-                    else if (gameValueData[i, j] == 1)
-                    {
-                        blackTiles += 1;
-                    }
-                }
-            }
-
-            // Update the display text for the totals of each player
-            boardForm!.SetPlayerTotalString(whiteTiles.ToString(), blackTiles.ToString());
         }
 
         /// <summary>
@@ -771,5 +797,8 @@ namespace Assignment1
             
             
         }
+
+        #endregion
+
     }
 }
