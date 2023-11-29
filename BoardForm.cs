@@ -155,11 +155,23 @@ namespace Assignment1
 
         #region Event handlers
 
+        /// <summary>
+        ///         Checks if a tile is set to Available or not
+        /// </summary>
+        /// <param name="row">Defines the row position to check</param>
+        /// <param name="col">Defines the col position to check</param>
+        /// <returns>True if the file is set to available, false otherwise</returns>
         private bool IsTileSetAvailable(int row, int col)
         {
             return Path.GetFileNameWithoutExtension(gameGUIData!.GetTile(row,col).ImageLocation) == "11";
         }
 
+        /// <summary>
+        ///         Delegate for when a tile is trying to be changed on the GUI.
+        /// </summary>
+        /// <param name="row">Defines the row position to be changed</param>
+        /// <param name="col">Defines the col position to be changed</param>
+        /// <param name="tileName">The value to change the tile to</param>
         private void SetGuiTile(int row, int col, string tileName)
         {
             gameGUIData.SetTile(row, col, tileName);
@@ -359,6 +371,9 @@ namespace Assignment1
 
         #region Setter Functions        
 
+        /// <summary>
+        ///         Resets the value of the game data in game logic back to default
+        /// </summary>
         private void ResetMapDelegate()
         {
             gameLogic.gameValueData = InitialiseBoard();

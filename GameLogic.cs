@@ -18,6 +18,7 @@ namespace Assignment1
     internal class GameLogic
     {
         #region Variable Initialisation
+
         // Player 0 is white, player 1 is black. White plays first
         internal int player = 0;
 
@@ -54,7 +55,6 @@ namespace Assignment1
         };
 
         // Initialise an array of pic boxes for board
-        readonly GameboardImageArray? gameGUIData;
         internal int[,] gameValueData;
 
 
@@ -65,6 +65,9 @@ namespace Assignment1
         internal readonly string[]? voices;
         internal bool textToSpeechActive;
 
+        #endregion
+
+        #region Delegate Initialisation
 
         public delegate void GameLogicDelegate();
         public event GameLogicDelegate? PlayerTotalsChanged;
@@ -343,7 +346,6 @@ namespace Assignment1
             return false;
         }
 
-
         /// <summary>
         /// 
         /// Check whether the game is over by seeing if all of the tiles are taken by the players.
@@ -558,7 +560,6 @@ namespace Assignment1
 
             }
         }
-
 
         /// <summary>
         ///         Loads all of the save games onto the menu.
