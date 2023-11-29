@@ -178,10 +178,9 @@ namespace GameboardGUI
         /// <param name="col">index Column of the element</param>
         /// <param name="imageName">The name of the PNG file to be used without the .png extension included in the name.</param>
         /// <returns></returns>
-        public bool SetTile(int row, int col, string imageName)
+        public void SetTile(int row, int col, string imageName)
         {
             _boardTiles[row, col].ImageLocation = _tileImagesPath + imageName + ".PNG";
-            return true;
         }
 
 

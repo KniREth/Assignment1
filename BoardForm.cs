@@ -30,9 +30,6 @@ namespace Assignment1
         const int numRows = 8;
         const int numCols = 8;
 
-        // boolean to check whether game has been saved when user tries to leave game
-        internal bool isGameSaved = false;
-
         // Initialise an array of pic boxes for board
         readonly GameboardImageArray? gameGUIData;
         internal int[,] gameValueData;
@@ -40,19 +37,6 @@ namespace Assignment1
 
         // New game logic class
         readonly GameLogic? gameLogic;
-
-        // Initialise speech synthesis and the string array of voices for use by different players
-        internal readonly SpeechSynthesizer? speechSynth;
-        internal readonly string[]? voices;
-
-
-
-        public delegate void MenuItemClickedEventDelegate(object sender, EventArgs e);
-        public event MenuItemClickedEventDelegate? SaveButtonClicked;
-        public event MenuItemClickedEventDelegate? LoadButtonClicked;
-        public event MenuItemClickedEventDelegate? OverwriteButtonClicked;
-        public event MenuItemClickedEventDelegate? NewGameButtonClicked;
-        public event MenuItemClickedEventDelegate? GameboardTileClicked;
 
         #endregion
 
@@ -86,7 +70,26 @@ namespace Assignment1
             // Try to load the game's logic 
             try
             {
-                gameLogic = new GameLogic(gameGUIData!, this);
+                gameLogic = new GameLogic(gameValueData);
+                gameLogic.PlayerTotalsChanged += new GameLogic.GameLogicDelegate(SetPlayerTotalString);
+                gameLogic.PlayerTurnChanged += new GameLogic.GameLogicDelegate(SetPlayerToMoveIcon);
+                gameLogic.DropDownMenuToClear += new GameLogic.GameLogicDelegate(ClearDropDownMenus);
+                gameLogic.DropDownMenuVisibilityChanged += new GameLogic.GameLogicBoolDelegate(SetDropDownMenuVisibility);
+                gameLogic.BoardValuesToDefault += new GameLogic.GameLogicDelegate(ResetMapDelegate);
+
+                gameLogic.PlayerNameAccessibilityChanged += new GameLogic.GameLogicBoolDelegate(SetPlayerNameAccessibility);
+                gameLogic.InformationPanelVisibilityChanged += new GameLogic.GameLogicBoolDelegate(SetInformationPanelVisible);
+                gameLogic.TextToSpeechActiveChanged += new GameLogic.GameLogicBoolDelegate(SetTextToSpeech);
+
+                gameLogic.PlayerNamesChanged += new GameLogic.GameLogicStringDelegate(SetPlayerNames);
+
+                gameLogic.DropDownMenuCreated += new GameLogic.GameLogicSaveDelegate(CreateDropDownMenu);
+
+                gameLogic.TileChanged += new GameLogic.GameLogicTileSetterDelegate(SetGuiTile);
+
+                gameLogic.TileCleared += new GameLogic.GameLogicTileClearDelegate(IsTileSetAvailable);
+
+                gameLogic.validTiles = gameLogic.GetValidTiles();
             }
             catch(Exception ex) 
             {
@@ -102,19 +105,6 @@ namespace Assignment1
             catch (Exception ex)
             {
                 DialogResult result = MessageBox.Show(ex.ToString(), "Cannot fetch save games");
-                this.Close();
-            }
-
-            // Try to load the speech synthesizer for text to speech
-            try
-            {
-                speechSynth = new SpeechSynthesizer();
-                speechSynth.SetOutputToDefaultAudioDevice();
-                voices = speechSynth.GetInstalledVoices().Where(v => v.Enabled).Select(v => v.VoiceInfo.Name).ToArray();
-            }
-            catch (Exception ex)
-            {
-                DialogResult result = MessageBox.Show(ex.ToString(), "Cannot load speech synthesizer");
                 this.Close();
             }
 
@@ -140,17 +130,21 @@ namespace Assignment1
                 {
                     // Set initial white board pieces
                     if ((row == 4 && col == 4) || (row == 3 && col == 3))
-                    { boardVal = 0; }
+                    { 
+                        boardVal = 0;
+                    }
                     // Set initial black board pieces
                     else if ((row == 3 && col == 4) || (row == 4 && col == 3))
-                    { boardVal = 1; }
+                    { 
+                        boardVal = 1;
+                    }
                     // Set rest of board as clear pieces
                     else boardVal = 10;
 
-                    // Update the array at the current position to the corrosponding value as found above
-                    boardArray[row, col] = boardVal;
-
                     gameGUIData?.SetTile(row, col, boardVal.ToString());
+                   
+                    // Update the array at the current position to the corrosponding value as found above
+                    boardArray[row, col] = boardVal;                    
                 }
             }
 
@@ -160,6 +154,16 @@ namespace Assignment1
         #endregion
 
         #region Event handlers
+
+        private bool IsTileSetAvailable(int row, int col)
+        {
+            return Path.GetFileNameWithoutExtension(gameGUIData!.GetTile(row,col).ImageLocation) == "11";
+        }
+
+        private void SetGuiTile(int row, int col, string tileName)
+        {
+            gameGUIData.SetTile(row, col, tileName);
+        }
 
         /// <summary>
         ///         Event hanlder for when the player clicks a game tile.
@@ -172,7 +176,13 @@ namespace Assignment1
             if (!p1NameEntered) { txtBoxP1Name.Text = "Player #1"; }
             if (!p2NameEntered) { txtBoxP2Name.Text = "Player #2"; }
 
-            GameboardTileClicked!(sender, e);
+            gameLogic.playerNames[0]  = txtBoxP1Name.Text;
+            gameLogic.playerNames[1] = txtBoxP2Name.Text;
+
+            // Set the row and col into variables for readability
+            int rowClicked = gameGUIData!.GetCurrentRowIndex(sender);
+            int colClicked = gameGUIData!.GetCurrentColumnIndex(sender);
+            gameLogic.CheckPath(rowClicked, colClicked);
         }  
 
         /// <summary>
@@ -207,9 +217,19 @@ namespace Assignment1
         /// <param name="e"></param>
         private void NewGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this != null) 
-            { 
-                NewGameButtonClicked!(sender, e);
+            // Speech if required
+            if (gameLogic.textToSpeechActive)
+            {
+                gameLogic.speechSynth!.Speak("Warning, any unsaved progress will be lost. Do you want to continue?");
+            }
+
+            // Prompt the user that they will lose unsaved data if they continue
+            DialogResult choice = MessageBox.Show("Warning, any unsaved progress will be lost.\nContinue?", "New Game", MessageBoxButtons.YesNo);
+
+            // Check if the user presses to continue
+            if (choice == DialogResult.Yes)
+            {
+                gameLogic.ResetMap();
             }
         }
 
@@ -220,10 +240,7 @@ namespace Assignment1
         /// <param name="e"></param>
         private void SaveGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this != null)
-            {
-                SaveButtonClicked!(sender, e);
-            }
+            gameLogic.CreateNewSave();
         }
 
         /// <summary>
@@ -233,10 +250,8 @@ namespace Assignment1
         /// <param name="e"></param>
         private void LoadGame_Click(object sender, EventArgs e)
         {
-            if (this != null)
-            {
-                LoadButtonClicked!(sender, e);               
-            }
+            string? saveName = sender.ToString();
+            if (saveName != null) { gameLogic.LoadGame(saveName); }
         }
 
         /// <summary>
@@ -245,8 +260,9 @@ namespace Assignment1
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void OverwriteSave_Click(object sender, EventArgs e)
-        {                
-            OverwriteButtonClicked!(sender, e);
+        {
+            string? saveToOverwrite = sender.ToString();
+            if (saveToOverwrite != null) { gameLogic.OverwriteSave(saveToOverwrite); }
         }
 
         /// <summary>
@@ -267,7 +283,7 @@ namespace Assignment1
             txtBoxP1Name.Visible = isChecked;
             txtBoxP2Name.Visible = isChecked;
             picBoxPlayerToMove.Visible = isChecked;
-
+            gameLogic.isInfoPanelVisible = isChecked;
         }
 
         /// <summary>
@@ -279,9 +295,10 @@ namespace Assignment1
         {
             if (speakToolStripMenuItem.Checked)
             {
-                speechSynth!.Speak("Speech synthesis turned on.");
+                gameLogic.speechSynth!.Speak("Speech synthesis turned on.");
+                gameLogic.textToSpeechActive = true;
             }
-            else { speechSynth!.Speak("Speech synthesis turned off"); }
+            else { gameLogic.speechSynth!.Speak("Speech synthesis turned off"); gameLogic.textToSpeechActive = false; }
         }
 
         /// <summary>
@@ -318,7 +335,7 @@ namespace Assignment1
         /// <param name="e"></param>
         private void BoardForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!isGameSaved)
+            if (!gameLogic.isGameSaved)
             {
                 DialogResult result = MessageBox.Show("The current game instance is not saved. Continue?", "Exit Game", MessageBoxButtons.YesNo);
                 if (result == DialogResult.No) { e.Cancel = true; }
@@ -328,7 +345,6 @@ namespace Assignment1
         #endregion
 
         #region Getter functions
-
         /// <summary>
         ///         Getter function for the names that the players enter into the text box.
         /// </summary>
@@ -339,38 +355,25 @@ namespace Assignment1
             return new string[] {txtBoxP1Name.Text, txtBoxP2Name.Text};
         }
 
-        /// <summary>
-        ///         Getter function to check whether text to speech is activated or not.
-        /// </summary>
-        /// <returns>Returns a boolean of whether text to speech is checked. True = Active. False = Not Active.</returns>
-        internal bool GetIsTextToSpeechActive()
-        {
-            return speakToolStripMenuItem.Checked;
-        }
-
-        /// <summary>
-        ///         Checks whether the information panel is checked or not in the menu.
-        /// </summary>
-        /// <returns>Returns True = Visible or False = Not Visible.</returns>
-        internal bool GetIsInformationPanelVisible()
-        {
-            return informationPanelToolStripMenuItem.Checked;
-        }
-
         #endregion
 
         #region Setter Functions        
+
+        private void ResetMapDelegate()
+        {
+            gameLogic.gameValueData = InitialiseBoard();
+        }
 
         /// <summary>
         ///         Setter function for the label which displays the total for each player. 
         /// </summary>
         /// <param name="totalP1">The amount which needs to be displayed for player 1</param>
         /// <param name="totalP2">The amount which needs to be displayed for player 2</param>
-        internal void SetPlayerTotalString(string totalP1, string totalP2)
+        private void SetPlayerTotalString()
         {
             // Update the display text for the totals of each player
-            lblP1Val.Text = totalP1 + " x";
-            lblP2Val.Text = totalP2 + " x";
+            lblP1Val.Text = gameLogic!.whiteTiles.ToString() + " x";
+            lblP2Val.Text = gameLogic.blackTiles.ToString() + " x";
         }
 
         /// <summary>
@@ -378,7 +381,7 @@ namespace Assignment1
         ///         edit their name in the text box.
         /// </summary>
         /// <param name="enabled">Boolean to set if the text boxes should be editable. True = Editable. False = Not editable.</param>
-        internal void SetPlayerNameAccessibility(bool enabled)
+        private void SetPlayerNameAccessibility(bool enabled)
         {
             // Set the text box accessibility as the param passed through
             txtBoxP1Name.Enabled = enabled;
@@ -390,7 +393,7 @@ namespace Assignment1
         /// </summary>
         /// <param name="player1Name">String value for the name of Player 1.</param>
         /// <param name="player2Name">String value for the name of Player 2.</param>
-        internal void SetPlayerNames(string player1Name, string player2Name)
+        private void SetPlayerNames(string player1Name, string player2Name)
         {
             // Set the text box to the value in the parameters
             txtBoxP1Name.Text = player1Name;
@@ -402,7 +405,7 @@ namespace Assignment1
         ///         and the overwrite save button. This should be set as false if there is no current save games.
         /// </summary>
         /// <param name="visible">The value which will determine the menu button visibility. True = Visible. False = Not visible</param>
-        internal void SetDropDownMenuVisibility(bool visible)
+        private void SetDropDownMenuVisibility(bool visible)
         {
             // Set the visibility as the param entered.
             loadGameToolStripMenuItem.Visible = visible;
@@ -413,10 +416,10 @@ namespace Assignment1
         ///         Setter function for the picture box which indicates the next player to move.
         /// </summary>
         /// <param name="player">Player determines which picture box should be displayed. Player 1 = Left, Player 2 = Right.</param>
-        internal void SetPlayerToMoveIcon(int player)
+        private void SetPlayerToMoveIcon()
         {
             // Swap arrow img for next player move
-            if (player == 0) { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "left.PNG"; }
+            if (gameLogic.player == 0) { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "left.PNG"; }
             else { picBoxPlayerToMove.ImageLocation = tileImagesDirPath + "right.PNG"; }
         }
 
@@ -424,7 +427,7 @@ namespace Assignment1
         ///         Sets whether the text to speech should be turned on or off
         /// </summary>
         /// <param name="active">True = TTS Active. False = TTS Not Active.</param>
-        internal void SetTextToSpeech(bool active)
+        private void SetTextToSpeech(bool active)
         {
             speakToolStripMenuItem.Checked = active;
         }
@@ -433,7 +436,7 @@ namespace Assignment1
         ///         Sets whether the information panel should be visible or not.
         /// </summary>
         /// <param name="active">True = Visible. False = Not Visible</param>
-        internal void SetInformationPanelVisible(bool active)
+        private void SetInformationPanelVisible(bool active)
         {
             informationPanelToolStripMenuItem.Checked = active;
         }
@@ -442,7 +445,7 @@ namespace Assignment1
         ///         Clear the items which are displayed in the drop down menus for overwriteSaveToolStripMenuItem 
         ///         and loadGameToolStripMenuItem.DropDownItems
         /// </summary>
-        internal void ClearDropDownMenus()
+        private void ClearDropDownMenus()
         {
             // Clear menu dropdown items.
             loadGameToolStripMenuItem.DropDownItems.Clear();
@@ -455,7 +458,7 @@ namespace Assignment1
         /// </summary>
         /// <param name="saveGame">The save game which needs to be loaded onto the drop down menu</param>
         /// <param name="index">The position in the drop down where the current save game is being loaded.</param>
-        internal void CreateDropDownMenu(SaveGame saveGame, int index)
+        private void CreateDropDownMenu(SaveGame saveGame, int index)
         {
             // Create a new drop down item for the load game drop down and Overwrite save and insert it
             ToolStripMenuItem newItem = new() { Name = "New save " + index.ToString(), Text = saveGame.saveName };

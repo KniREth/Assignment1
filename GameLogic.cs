@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Text;
 using System.Text.Json;
@@ -18,17 +19,23 @@ namespace Assignment1
     {
         #region Variable Initialisation
         // Player 0 is white, player 1 is black. White plays first
-        int player = 0;
+        internal int player = 0;
+
+        // Initialise player names
+        internal string[] playerNames = new string[2];
 
         // The initial number of tiles each player has on the board
-        int blackTiles = 2;
-        int whiteTiles = 2;
+        internal int blackTiles = 2;
+        internal int whiteTiles = 2;
 
         // Valid tiles for each player
-        List<Point> validTiles = new();
+        internal List<Point> validTiles = new();
 
         // All of the SaveGame objects which have been deserialised from the SaveGame.JSON file
         internal readonly List<SaveGame> saveGames = new();
+
+        // boolean to check whether game has been saved when user tries to leave game
+        internal bool isGameSaved = false;
 
         // The directory for the save game file
         readonly string saveDataDirPath = Directory.GetCurrentDirectory() + @"\saves\game_data.JSON";
@@ -48,125 +55,60 @@ namespace Assignment1
 
         // Initialise an array of pic boxes for board
         readonly GameboardImageArray? gameGUIData;
-        int[,]? gameValueData;
+        internal int[,] gameValueData;
 
-        readonly BoardForm? boardForm;
+
+        public bool isInfoPanelVisible = true;
+
+        // Initialise speech synthesis and the string array of voices for use by different players
+        internal readonly SpeechSynthesizer? speechSynth;
+        internal readonly string[]? voices;
+        internal bool textToSpeechActive;
+
+
+        public delegate void GameLogicDelegate();
+        public event GameLogicDelegate? PlayerTotalsChanged;
+        public event GameLogicDelegate? PlayerTurnChanged;
+        public event GameLogicDelegate? DropDownMenuToClear;
+        public event GameLogicDelegate? BoardValuesToDefault;
+
+        public delegate void GameLogicBoolDelegate(bool b);
+        public event GameLogicBoolDelegate? PlayerNameAccessibilityChanged;
+        public event GameLogicBoolDelegate? InformationPanelVisibilityChanged;
+        public event GameLogicBoolDelegate? TextToSpeechActiveChanged;
+        public event GameLogicBoolDelegate? DropDownMenuVisibilityChanged;
+
+        public delegate void GameLogicStringDelegate(string str1, string str2);
+        public event GameLogicStringDelegate? PlayerNamesChanged;
+
+        public delegate void GameLogicSaveDelegate(SaveGame saveGame, int i);
+        public event GameLogicSaveDelegate? DropDownMenuCreated;
+
+        public delegate void GameLogicTileSetterDelegate(int r, int c, string s);
+        public event GameLogicTileSetterDelegate TileChanged;
+
+        public delegate bool GameLogicTileClearDelegate(int r, int c);
+        public event GameLogicTileClearDelegate TileCleared;
 
         #endregion
 
         #region Constructor
 
         // Constructor for class
-        public GameLogic(GameboardImageArray gameGUIData, BoardForm boardForm) 
+        public GameLogic(int[,] gameValueData) 
         {
-            // Try to load the game gui which is passed through
+            this.gameValueData = gameValueData;
+            
+            // Try to load the speech synthesizer for text to speech
             try
             {
-                this.gameGUIData = gameGUIData;
+                speechSynth = new SpeechSynthesizer();
+                speechSynth.SetOutputToDefaultAudioDevice();
+                voices = speechSynth.GetInstalledVoices().Where(v => v.Enabled).Select(v => v.VoiceInfo.Name).ToArray();
             }
             catch (Exception ex)
             {
-                _ = MessageBox.Show(ex.ToString(), "Cannot fetch GameGUIData", MessageBoxButtons.OK);
-            }
-
-            // Try to load the board form and create new event delegates for the event handlers
-            try
-            {
-                this.boardForm = boardForm;
-                gameValueData = boardForm.gameValueData;
-                boardForm.SaveButtonClicked += new BoardForm.MenuItemClickedEventDelegate(CreateNewSaveDelegate);
-                boardForm.LoadButtonClicked += new BoardForm.MenuItemClickedEventDelegate(LoadGameDelegate);
-                boardForm.OverwriteButtonClicked += new BoardForm.MenuItemClickedEventDelegate(OverwriteSaveDelegate);
-                boardForm.NewGameButtonClicked += new BoardForm.MenuItemClickedEventDelegate(ResetMapDelegate);
-                boardForm.GameboardTileClicked += new BoardForm.MenuItemClickedEventDelegate(GameTileClickedDelegate);
-            }
-            catch (Exception ex)
-            {
-                _ = MessageBox.Show(ex.ToString(), "Cannot load board form", MessageBoxButtons.OK);
-            }
-
-            // Display all of the initial valid tiles to the screen
-            GetValidTiles();
-        }
-
-        #endregion
-
-        #region Event Delegates
-
-        /// <summary>
-        ///         When the user presses the save game button, the handler will call here 
-        ///         which will delegate to the CreateNewSave() function.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CreateNewSaveDelegate(object sender, EventArgs e)
-        {
-            CreateNewSave();
-        }
-
-        /// <summary>
-        ///         When the user presses the Load game button, the handler will call this function which gets
-        ///         the save name to load and calls the LoadGame() function passing the necessary save name.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LoadGameDelegate(object sender, EventArgs e)
-        {
-            string? saveName = sender.ToString();
-            if (saveName != null) { LoadGame(saveName); }
-        }
-
-        /// <summary>
-        ///         When the user presses the overwrite save button, it will be called to here where it will
-        ///         delegate the event tot the OverwriteSave() fuction with the necessary save which needs to be 
-        ///         overwritten
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OverwriteSaveDelegate(object sender, EventArgs e)
-        {
-            string? saveToOverwrite = sender.ToString();
-            if (saveToOverwrite != null) { OverwriteSave(saveToOverwrite); }
-        }
-
-        /// <summary>
-        ///         When the user presses the reset map button, the event will be delegated to the ResetMap()
-        ///         function after the user is prompted to continue or not.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ResetMapDelegate(object sender, EventArgs e)
-        {
-            // Speech if required
-            if (boardForm!.GetIsTextToSpeechActive())
-            {
-                boardForm.speechSynth!.Speak("Warning, any unsaved progress will be lost. Do you want to continue?");
-            }
-
-            // Prompt the user that they will lose unsaved data if they continue
-            DialogResult choice = MessageBox.Show("Warning, any unsaved progress will be lost.\nContinue?", "New Game", MessageBoxButtons.YesNo);
-
-            // Check if the user presses to continue
-            if (choice == DialogResult.Yes)
-            {
-                ResetMap();
-            }
-        }
-
-        /// <summary>
-        ///         When the player clicks on a tile, it will call this function which will delegate the event to the
-        ///         CheckPath() function with the necessary row and col.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void GameTileClickedDelegate(object sender, EventArgs e)
-        {
-            if (this != null)
-            {
-                // Set the row and col into variables for readability
-                int rowClicked = gameGUIData!.GetCurrentRowIndex(sender);
-                int colClicked = gameGUIData!.GetCurrentColumnIndex(sender);
-                CheckPath(rowClicked, colClicked);
+                DialogResult result = MessageBox.Show(ex.ToString(), "Cannot load speech synthesizer");
             }
         }
 
@@ -186,11 +128,11 @@ namespace Assignment1
             // Flag to check whether values need to be updated
             bool moveCheck = false;
 
-            // Initial validity check, if the tile is 10, it is a clear tile and hence may be valid
-            if (gameValueData![rowClicked, colClicked] == 10)
+            // Initial validity check, if the tile is 10 or 11, it is a clear tile and hence may be valid
+            if (gameValueData![rowClicked, colClicked] == 10 || gameValueData![rowClicked, colClicked] == 11)
             {
                 // The game has now started so make it so the players cannot change their name anymore
-                boardForm!.SetPlayerNameAccessibility(false);
+                PlayerNameAccessibilityChanged(false);
 
                 // Iterate though the offsets, checking the path
                 for (int x = 0; x < offsets.Count; x++)
@@ -208,13 +150,13 @@ namespace Assignment1
                             {
                                 gameValueData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] = player;
 
-                                gameGUIData!.SetTile(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
+                                TileChanged(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
                                 UpdatePlayerTotals(1, 1);
 
                                 moveCheck = true;
 
                                 // The game instance is changing, so therefore isn't saved.
-                                boardForm.isGameSaved = false;
+                                isGameSaved = false;
                             }
 
                         }
@@ -226,25 +168,29 @@ namespace Assignment1
                 if (moveCheck)
                 {
                     gameValueData[rowClicked, colClicked] = player;
-                    gameGUIData!.SetTile(rowClicked, colClicked, player.ToString());
+                    TileChanged(rowClicked, colClicked, player.ToString());
+
                     UpdatePlayerTotals(1, 0);
 
                     // If speech synthesis is on, say the tile which has been taken
-                    if (boardForm.GetIsTextToSpeechActive())
+                    if (textToSpeechActive)
                     {
                         // Add 1 to each due to 0 indexing
-                        boardForm.speechSynth!.Speak("Player" + (player + 1).ToString() + " has placed a token at " + (rowClicked + 1).ToString() + " " + (colClicked + 1).ToString());
+                       speechSynth!.Speak("Player" + (player + 1).ToString() + " has placed a token at " + (rowClicked + 1).ToString() + " " + (colClicked + 1).ToString());
                     }
                     SwapPlayer();
+                    // Get all of the valid tiles for the player
+                    ClearValidTiles();
+                    validTiles = GetValidTiles();
                 }
 
                 // TODO: Move this to the game logic class function for check path
                 if (CheckGameOver() || CheckStalemate())
                 {
                     // Speech if required
-                    if (boardForm.GetIsTextToSpeechActive())
+                    if (textToSpeechActive)
                     {
-                        boardForm.speechSynth!.Speak("Start a new game?");
+                       speechSynth!.Speak("Start a new game?");
                     }
 
                     // Prompt the user that they will lose unsaved data if they continue
@@ -257,18 +203,19 @@ namespace Assignment1
                         ResetMap();
                     }
                 }
+            }
+        }
 
-                // Clear valid tiles so that they can be reset 
-                for (int y = 0; y < validTiles.Count; y++)
-                {
-                    if (Path.GetFileNameWithoutExtension(gameGUIData!.GetTile(validTiles[y].X, validTiles[y].Y).ImageLocation) == "Available")
-                    {
-                        gameGUIData.SetTile(validTiles[y].X, validTiles[y].Y, "10");
-                    }
+
+        private void ClearValidTiles()
+        {
+            // Clear valid tiles so that they can be reset 
+            for (int y = 0; y < validTiles.Count; y++)
+            {
+                if (TileCleared(validTiles[y].X, validTiles[y].Y))
+                {                    
+                    TileChanged(validTiles[y].X, validTiles[y].Y, "10");                    
                 }
-
-                // Get all of the valid tiles for the player
-                validTiles = GetValidTiles();
             }
         }
 
@@ -304,7 +251,7 @@ namespace Assignment1
                             if (isValid.Item1.Count > 0 && isValid.Item2)
                             {
                                 validTiles.Add(new Point(i, j));
-                                gameGUIData!.SetTile(i, j, "Available");
+                                TileChanged(i, j, "11");
                             }
                         }
                     }
@@ -373,9 +320,9 @@ namespace Assignment1
             {
 
                 // Speech if required
-                if (boardForm!.GetIsTextToSpeechActive())
+                if (textToSpeechActive)
                 {
-                    boardForm.speechSynth!.Speak("No valid tiles, swapping player.");
+                   speechSynth!.Speak("No valid tiles, swapping player.");
                 }
 
                 MessageBox.Show("No valid tiles, swapping player.");
@@ -385,9 +332,9 @@ namespace Assignment1
                 if (GetValidTiles().Count <= 0)
                 {
                     // Speech if required
-                    if (boardForm.GetIsTextToSpeechActive())
+                    if (textToSpeechActive)
                     {
-                        boardForm.speechSynth!.Speak("No more valid tiles for either players.");
+                       speechSynth!.Speak("No more valid tiles for either players.");
                     }
                     MessageBox.Show("No more valid tiles for either players.");
                     return true;
@@ -411,9 +358,9 @@ namespace Assignment1
                 if (whiteTiles > blackTiles)
                 {
                     // Speech if required
-                    if (boardForm!.GetIsTextToSpeechActive())
+                    if (textToSpeechActive)
                     {
-                        boardForm.speechSynth!.Speak("Game over, White wins!");
+                       speechSynth!.Speak("Game over, White wins!");
                     }
 
                     MessageBox.Show("Game over, White wins!");
@@ -421,9 +368,9 @@ namespace Assignment1
                 else
                 {
                     // Speech if required
-                    if (boardForm!.GetIsTextToSpeechActive())
+                    if (textToSpeechActive)
                     {
-                        boardForm.speechSynth!.Speak("Game over, Black wins!");
+                       speechSynth!.Speak("Game over, Black wins!");
                     }
 
                     MessageBox.Show("Game over, Black wins!");
@@ -454,10 +401,10 @@ namespace Assignment1
             // Swap to next player's turn
             player = (player + 1) % 2;
 
-            boardForm!.SetPlayerToMoveIcon(player);
+            PlayerTurnChanged();
             
             // Set the speech synthesiser's voice to the specified player
-            boardForm.speechSynth!.SelectVoice(boardForm.voices![player]);
+            speechSynth!.SelectVoice(voices![player]);
         }
 
         /// <summary>
@@ -480,9 +427,7 @@ namespace Assignment1
                 blackTiles += valueToAdd;
                 whiteTiles -= valueToRemove;
             }
-
-            boardForm!.SetPlayerTotalString(whiteTiles.ToString(), blackTiles.ToString());
-
+            PlayerTotalsChanged();
         }
 
         /// <summary>
@@ -510,7 +455,7 @@ namespace Assignment1
             }
 
             // Update the display text for the totals of each player
-            boardForm!.SetPlayerTotalString(whiteTiles.ToString(), blackTiles.ToString());
+            PlayerTotalsChanged();
         }
 
         #endregion
@@ -523,15 +468,18 @@ namespace Assignment1
         internal void ResetMap()
         {
             // Reset board data
-            gameValueData = boardForm!.InitialiseBoard();
+            BoardValuesToDefault();
+
+            if (player == 1) { SwapPlayer(); }
 
             // Fetch all of the current valid tiles to be displayed
-            GetValidTiles();
+            validTiles = GetValidTiles();
 
             // Get player totals to load to screen
             GetPlayerTotals();
 
-            boardForm.SetPlayerNameAccessibility(true);
+            PlayerNameAccessibilityChanged(true);
+
         }
 
         #endregion
@@ -548,9 +496,9 @@ namespace Assignment1
             string defaultSaveName = DateTime.Now.ToString();
 
             // Speech if required
-            if (boardForm!.GetIsTextToSpeechActive())
+            if (textToSpeechActive)
             {
-                boardForm.speechSynth!.Speak("Enter name of save game.");
+               speechSynth!.Speak("Enter name of save game.");
             }
 
             // Display a message box for the player to choose the name of their save game
@@ -566,9 +514,9 @@ namespace Assignment1
                     if (saveGames[i].saveName == saveName)
                     {
                         // Speech if required
-                        if (boardForm.GetIsTextToSpeechActive())
+                        if (textToSpeechActive)
                         {
-                            boardForm.speechSynth!.Speak("Save name already exists, setting name as default name.");
+                           speechSynth!.Speak("Save name already exists, setting name as default name.");
                         }
                         MessageBox.Show("Save name already exists, setting name as default name");
                         saveName = defaultSaveName;
@@ -577,9 +525,7 @@ namespace Assignment1
                 }
 
                 // Delete the initial file
-                File.Delete(saveDataDirPath);
-
-                string[] playerNames = boardForm!.GetPlayerNames();
+                File.Delete(saveDataDirPath);  
 
                 // Iterate through all of the SaveGame objects in the list
                 for (int i = 0; i < saveGames.Count; i++)
@@ -591,8 +537,8 @@ namespace Assignment1
                         saveGames[i].player1Name = playerNames[0];
                         saveGames[i].player2Name = playerNames[1];
                         saveGames[i].playerTurn = player;
-                        saveGames[i].isSpeechActivated = boardForm.GetIsTextToSpeechActive();
-                        saveGames[i].isInformationPanelVisible = boardForm.GetIsInformationPanelVisible();
+                        saveGames[i].isSpeechActivated = textToSpeechActive;
+                        saveGames[i].isInformationPanelVisible = isInfoPanelVisible;
                         for (int j = 0; j < gameValueData!.GetLength(0); j++)
                         {
                             for (int x = 0; x < gameValueData.GetLength(1); x++)
@@ -605,7 +551,7 @@ namespace Assignment1
                     File.AppendAllText(saveDataDirPath, saveGames[i].Serialise() + "\n");
                 }
                 // Game has just been saved, so set isGameSaved as true
-                boardForm.isGameSaved = true;
+                isGameSaved = true;
 
                 // Load all of the new save games back to the menu
                 GetSaveGames();
@@ -629,7 +575,7 @@ namespace Assignment1
 
             // Clear the list of SaveGame objects from the list and clear the menu drop down items
             saveGames.Clear();
-            boardForm!.ClearDropDownMenus();
+            DropDownMenuToClear();
 
             // Read the save game file and save data to the string array
             // Each line in the file will be a separate index in the array
@@ -639,7 +585,7 @@ namespace Assignment1
             if (saveData.Length > 0)
             {
                 // Ensure that the player can see the load and save games
-                boardForm.SetDropDownMenuVisibility(true);
+                DropDownMenuVisibilityChanged(true);
 
                 // Iterate through the string array, hence iterate through the data in the file
                 for (int i = 0; i < saveData.Length; i++)
@@ -647,14 +593,14 @@ namespace Assignment1
                     // Serialise each line in the array into a Object and add objects intoa list of objects
                     saveGames.Add(JsonSerializer.Deserialize<SaveGame>(saveData[i])!);
 
-                    boardForm.CreateDropDownMenu(saveGames[i], i);
+                    DropDownMenuCreated(saveGames[i], i);
                 }
             }
 
             // Make the load game and overwrite save buttons not visible as they are not needed
             else
             {
-                boardForm.SetDropDownMenuVisibility(false);
+                DropDownMenuVisibilityChanged(false);
             }
         }
 
@@ -685,7 +631,7 @@ namespace Assignment1
             if (indexToLoad >= 0)
             {
                 // Load the player names and player turn
-                boardForm!.SetPlayerNames(saveGames[indexToLoad].player1Name, saveGames[indexToLoad].player2Name);
+                PlayerNamesChanged(saveGames[indexToLoad].player1Name, saveGames[indexToLoad].player2Name);
 
                 if (saveGames[indexToLoad].playerTurn != player) { SwapPlayer(); }
                 // Iterate through the game board and change the tiles to game to load's tiles
@@ -694,7 +640,7 @@ namespace Assignment1
                     for (int j = 0; j < gameValueData.GetLength(1); j++)
                     {
                         gameValueData[i, j] = saveGames[indexToLoad].gameData[i][j];
-                        gameGUIData!.SetTile(i, j, gameValueData[i, j].ToString());
+                        TileChanged(i, j, gameValueData[i, j].ToString());
                     }
                 }
 
@@ -705,15 +651,14 @@ namespace Assignment1
                 GetPlayerTotals();
 
                 // Set the settings of the game to the saved value
-                boardForm.SetInformationPanelVisible(saveGames[indexToLoad].isInformationPanelVisible);
-                boardForm.SetTextToSpeech(saveGames[indexToLoad].isSpeechActivated);
-
+                InformationPanelVisibilityChanged(saveGames[indexToLoad].isInformationPanelVisible);
+                TextToSpeechActiveChanged(saveGames[indexToLoad].isSpeechActivated);
 
                 // Loading an active game so names shouldn't be editable
-                boardForm.SetPlayerNameAccessibility(false);
+                PlayerNameAccessibilityChanged(false);
 
                 // This game has just been loaded, so is saved, therefore set isGameSaved as true
-                boardForm.isGameSaved = true;
+                isGameSaved = true;
             }
         }
 
@@ -736,9 +681,9 @@ namespace Assignment1
                 string defaultSaveName = DateTime.Now.ToString();
 
                 // Speech if required
-                if (boardForm!.GetIsTextToSpeechActive())
+                if (textToSpeechActive)
                 {
-                    boardForm.speechSynth!.Speak("Enter name of save game.");
+                   speechSynth!.Speak("Enter name of save game.");
                 }
 
                 // Display a message box for the player to choose the name of their save game
@@ -773,15 +718,13 @@ namespace Assignment1
                             }
                         }
 
-                        string[] playerNames = boardForm!.GetPlayerNames();
-
                         // Create a new SaveGame object with the new data 
-                        SaveGame newSave = new(saveName, playerNames[0], playerNames[1], gameData, player, boardForm.GetIsTextToSpeechActive(), boardForm.GetIsInformationPanelVisible());
+                        SaveGame newSave = new(saveName, playerNames[0], playerNames[1], gameData, player, textToSpeechActive, isInfoPanelVisible);
 
                         // Serialise and append this data to the save game file
                         File.AppendAllText(saveDataDirPath, newSave.Serialise() + "\n");
 
-                        boardForm.isGameSaved = true;
+                        isGameSaved = true;
                     }
                 }
 
@@ -791,19 +734,15 @@ namespace Assignment1
             else
             {
                 // Speech if required
-                if (boardForm!.GetIsTextToSpeechActive())
+                if (textToSpeechActive)
                 {
-                    boardForm.speechSynth!.Speak("You can only have 5 save game slots, choose a game to overwrite.");
+                   speechSynth!.Speak("You can only have 5 save game slots, choose a game to overwrite.");
                 }
                 MessageBox.Show("You can only have 5 save game slots, choose a game to overwrite.");
-            }
-
-
-            
-            
+            }              
         }
 
         #endregion
 
     }
-}
+}  
