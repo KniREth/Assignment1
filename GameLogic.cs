@@ -88,10 +88,10 @@ namespace Assignment1
         public event GameLogicSaveDelegate? DropDownMenuCreated;
 
         public delegate void GameLogicTileSetterDelegate(int r, int c, string s);
-        public event GameLogicTileSetterDelegate TileChanged;
+        public event GameLogicTileSetterDelegate? TileChanged;
 
         public delegate bool GameLogicTileClearDelegate(int r, int c);
-        public event GameLogicTileClearDelegate TileCleared;
+        public event GameLogicTileClearDelegate? TileCleared;
 
         #endregion
 
@@ -135,7 +135,7 @@ namespace Assignment1
             if (gameValueData![rowClicked, colClicked] == 10 || gameValueData![rowClicked, colClicked] == 11)
             {
                 // The game has now started so make it so the players cannot change their name anymore
-                PlayerNameAccessibilityChanged(false);
+                PlayerNameAccessibilityChanged!(false);
 
                 // Iterate though the offsets, checking the path
                 for (int x = 0; x < offsets.Count; x++)
@@ -153,7 +153,7 @@ namespace Assignment1
                             {
                                 gameValueData[TileCheck.Item1[y].X, TileCheck.Item1[y].Y] = player;
 
-                                TileChanged(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
+                                TileChanged!(TileCheck.Item1[y].X, TileCheck.Item1[y].Y, player.ToString());
                                 UpdatePlayerTotals(1, 1);
 
                                 moveCheck = true;
@@ -171,7 +171,7 @@ namespace Assignment1
                 if (moveCheck)
                 {
                     gameValueData[rowClicked, colClicked] = player;
-                    TileChanged(rowClicked, colClicked, player.ToString());
+                    TileChanged!(rowClicked, colClicked, player.ToString());
 
                     UpdatePlayerTotals(1, 0);
 
@@ -197,7 +197,7 @@ namespace Assignment1
                     }
 
                     // Prompt the user that they will lose unsaved data if they continue
-                    DialogResult choice = MessageBox.Show("Start a new game?", "New Game", MessageBoxButtons.YesNo);
+                    DialogResult? choice = MessageBox.Show("Start a new game?", "New Game", MessageBoxButtons.YesNo);
 
 
                     // Check if the user presses to continue
@@ -215,9 +215,9 @@ namespace Assignment1
             // Clear valid tiles so that they can be reset 
             for (int y = 0; y < validTiles.Count; y++)
             {
-                if (TileCleared(validTiles[y].X, validTiles[y].Y))
+                if (TileCleared!(validTiles[y].X, validTiles[y].Y))
                 {                    
-                    TileChanged(validTiles[y].X, validTiles[y].Y, "10");                    
+                    TileChanged!(validTiles[y].X, validTiles[y].Y, "10");                    
                 }
             }
         }
@@ -254,7 +254,7 @@ namespace Assignment1
                             if (isValid.Item1.Count > 0 && isValid.Item2)
                             {
                                 validTiles.Add(new Point(i, j));
-                                TileChanged(i, j, "11");
+                                TileChanged!(i, j, "11");
                             }
                         }
                     }
@@ -403,7 +403,7 @@ namespace Assignment1
             // Swap to next player's turn
             player = (player + 1) % 2;
 
-            PlayerTurnChanged();
+            PlayerTurnChanged!();
             
             // Set the speech synthesiser's voice to the specified player
             speechSynth!.SelectVoice(voices![player]);
@@ -429,7 +429,7 @@ namespace Assignment1
                 blackTiles += valueToAdd;
                 whiteTiles -= valueToRemove;
             }
-            PlayerTotalsChanged();
+            PlayerTotalsChanged!();
         }
 
         /// <summary>
@@ -457,7 +457,7 @@ namespace Assignment1
             }
 
             // Update the display text for the totals of each player
-            PlayerTotalsChanged();
+            PlayerTotalsChanged!();
         }
 
         #endregion
@@ -470,7 +470,7 @@ namespace Assignment1
         internal void ResetMap()
         {
             // Reset board data
-            BoardValuesToDefault();
+            BoardValuesToDefault!();
 
             if (player == 1) { SwapPlayer(); }
 
@@ -480,7 +480,7 @@ namespace Assignment1
             // Get player totals to load to screen
             GetPlayerTotals();
 
-            PlayerNameAccessibilityChanged(true);
+            PlayerNameAccessibilityChanged!(true);
 
         }
 
@@ -576,7 +576,7 @@ namespace Assignment1
 
             // Clear the list of SaveGame objects from the list and clear the menu drop down items
             saveGames.Clear();
-            DropDownMenuToClear();
+            DropDownMenuToClear!();
 
             // Read the save game file and save data to the string array
             // Each line in the file will be a separate index in the array
@@ -586,7 +586,7 @@ namespace Assignment1
             if (saveData.Length > 0)
             {
                 // Ensure that the player can see the load and save games
-                DropDownMenuVisibilityChanged(true);
+                DropDownMenuVisibilityChanged!(true);
 
                 // Iterate through the string array, hence iterate through the data in the file
                 for (int i = 0; i < saveData.Length; i++)
@@ -594,14 +594,14 @@ namespace Assignment1
                     // Serialise each line in the array into a Object and add objects intoa list of objects
                     saveGames.Add(JsonSerializer.Deserialize<SaveGame>(saveData[i])!);
 
-                    DropDownMenuCreated(saveGames[i], i);
+                    DropDownMenuCreated!(saveGames[i], i);
                 }
             }
 
             // Make the load game and overwrite save buttons not visible as they are not needed
             else
             {
-                DropDownMenuVisibilityChanged(false);
+                DropDownMenuVisibilityChanged!(false);
             }
         }
 
@@ -632,7 +632,7 @@ namespace Assignment1
             if (indexToLoad >= 0)
             {
                 // Load the player names and player turn
-                PlayerNamesChanged(saveGames[indexToLoad].player1Name, saveGames[indexToLoad].player2Name);
+                PlayerNamesChanged!(saveGames[indexToLoad].player1Name, saveGames[indexToLoad].player2Name);
 
                 if (saveGames[indexToLoad].playerTurn != player) { SwapPlayer(); }
                 // Iterate through the game board and change the tiles to game to load's tiles
@@ -641,7 +641,7 @@ namespace Assignment1
                     for (int j = 0; j < gameValueData.GetLength(1); j++)
                     {
                         gameValueData[i, j] = saveGames[indexToLoad].gameData[i][j];
-                        TileChanged(i, j, gameValueData[i, j].ToString());
+                        TileChanged!(i, j, gameValueData[i, j].ToString());
                     }
                 }
 
@@ -652,11 +652,11 @@ namespace Assignment1
                 GetPlayerTotals();
 
                 // Set the settings of the game to the saved value
-                InformationPanelVisibilityChanged(saveGames[indexToLoad].isInformationPanelVisible);
-                TextToSpeechActiveChanged(saveGames[indexToLoad].isSpeechActivated);
+                InformationPanelVisibilityChanged!(saveGames[indexToLoad].isInformationPanelVisible);
+                TextToSpeechActiveChanged!(saveGames[indexToLoad].isSpeechActivated);
 
                 // Loading an active game so names shouldn't be editable
-                PlayerNameAccessibilityChanged(false);
+                PlayerNameAccessibilityChanged!(false);
 
                 // This game has just been loaded, so is saved, therefore set isGameSaved as true
                 isGameSaved = true;
