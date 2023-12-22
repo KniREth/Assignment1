@@ -91,7 +91,7 @@ namespace Assignment1
 
                 gameLogic.validTiles = gameLogic.GetValidTiles();
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 DialogResult result = MessageBox.Show(ex.ToString(), "Cannot load game logic", MessageBoxButtons.OK);
                 this.Close();
@@ -130,21 +130,21 @@ namespace Assignment1
                 {
                     // Set initial white board pieces
                     if ((row == 4 && col == 4) || (row == 3 && col == 3))
-                    { 
+                    {
                         boardVal = 0;
                     }
                     // Set initial black board pieces
                     else if ((row == 3 && col == 4) || (row == 4 && col == 3))
-                    { 
+                    {
                         boardVal = 1;
                     }
                     // Set rest of board as clear pieces
                     else boardVal = 10;
 
                     gameGUIData?.SetTile(row, col, boardVal.ToString());
-                   
+
                     // Update the array at the current position to the corrosponding value as found above
-                    boardArray[row, col] = boardVal;                    
+                    boardArray[row, col] = boardVal;
                 }
             }
 
@@ -163,7 +163,7 @@ namespace Assignment1
         /// <returns>True if the file is set to available, false otherwise</returns>
         private bool IsTileSetAvailable(int row, int col)
         {
-            return Path.GetFileNameWithoutExtension(gameGUIData!.GetTile(row,col).ImageLocation) == "11";
+            return Path.GetFileNameWithoutExtension(gameGUIData!.GetTile(row, col).ImageLocation) == "11";
         }
 
         /// <summary>
@@ -188,14 +188,14 @@ namespace Assignment1
             if (!p1NameEntered) { txtBoxP1Name.Text = "Player #1"; }
             if (!p2NameEntered) { txtBoxP2Name.Text = "Player #2"; }
 
-            gameLogic.playerNames[0]  = txtBoxP1Name.Text;
+            gameLogic.playerNames[0] = txtBoxP1Name.Text;
             gameLogic.playerNames[1] = txtBoxP2Name.Text;
 
             // Set the row and col into variables for readability
             int rowClicked = gameGUIData!.GetCurrentRowIndex(sender);
             int colClicked = gameGUIData!.GetCurrentColumnIndex(sender);
             gameLogic.CheckPath(rowClicked, colClicked);
-        }  
+        }
 
         /// <summary>
         ///     Event handler for the text box of player 1 entering their name. 
@@ -364,7 +364,7 @@ namespace Assignment1
         internal string[] GetPlayerNames()
         {
             // Returns the value stored in the text box for each player.
-            return new string[] {txtBoxP1Name.Text, txtBoxP2Name.Text};
+            return new string[] { txtBoxP1Name.Text, txtBoxP2Name.Text };
         }
 
         #endregion
