@@ -85,7 +85,7 @@ namespace GameboardGUI
             {
                 _boardTiles = new PictureBox[_boardRows, _boardCols];
 
-                RenderGameStateToGui(parentForm, gameBoardStateArray);
+                RenderGameStateToGui(gameBoardStateArray);
             }
         }
         /// <summary>
@@ -178,10 +178,9 @@ namespace GameboardGUI
         /// <param name="col">index Column of the element</param>
         /// <param name="imageName">The name of the PNG file to be used without the .png extension included in the name.</param>
         /// <returns></returns>
-        public bool SetTile(int row, int col, string imageName)
+        public void SetTile(int row, int col, string imageName)
         {
             _boardTiles[row, col].ImageLocation = _tileImagesPath + imageName + ".PNG";
-            return true;
         }
 
 
@@ -192,7 +191,7 @@ namespace GameboardGUI
         /// </summary>
         /// <param name="parentForm"></param>
         /// <param name="gameStateArray"></param>
-        private void RenderGameStateToGui(Form parentForm, int[,] gameStateArray)
+        private void RenderGameStateToGui(int[,] gameStateArray)
         {
             for (int r = 0; r < _boardRows; r++)
             {
@@ -204,11 +203,13 @@ namespace GameboardGUI
                     int t = _topY;
                     if (r > 0)
                         t = t + (_tileHeight * r) + (_tileMargin * r);
-                    _boardTiles[r, c] = new PictureBox();
-                    _boardTiles[r, c].SizeMode = PictureBoxSizeMode.StretchImage;
-                    _boardTiles[r, c].Location = new Point(l, t);
-                    _boardTiles[r, c].Size = new Size(_tileWidth, _tileHeight);
-                    _boardTiles[r, c].ImageLocation = _tileImagesPath + gameStateArray[r, c].ToString() + ".PNG";
+                    _boardTiles[r, c] = new PictureBox
+                    {
+                        SizeMode = PictureBoxSizeMode.StretchImage,
+                        Location = new Point(l, t),
+                        Size = new Size(_tileWidth, _tileHeight),
+                        ImageLocation = _tileImagesPath + gameStateArray[r, c].ToString() + ".PNG"
+                    };
                     _boardTiles[r, c].Click += new EventHandler(TileClickListener!);
                     _containingForm.Controls.Add(_boardTiles[r, c]);
                 }
@@ -232,17 +233,6 @@ namespace GameboardGUI
         {
             int tileHeight = boardHeight / _boardCols;
             return tileHeight;
-        }
-
-        private void InitializeComponent()
-        {
-            SuspendLayout();
-            // 
-            // GameboardImageArray
-            // 
-            Name = "GameboardImageArray";
-            Size = new Size(1000, 1000);
-            ResumeLayout(false);
         }
 
         private int ComputeTileWidth(int boardWidth)

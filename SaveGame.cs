@@ -15,15 +15,19 @@ namespace Assignment1
         public string player1Name { get; set; }
         public string player2Name { get; set; }
         public int playerTurn { get; set; }
+        public bool isSpeechActivated { get; set; }
+        public bool isInformationPanelVisible {  get; set; }
         public int[][] gameData { get; set; }
 
-        public SaveGame(string saveName, string player1Name, string player2Name, int[][] gameData, int playerTurn)
+        public SaveGame(string saveName, string player1Name, string player2Name, int[][] gameData, int playerTurn, bool isSpeechActivated, bool isInformationPanelVisible)
         {
             this.saveName = saveName;
             this.player1Name = player1Name;
             this.player2Name = player2Name;
             this.playerTurn = playerTurn;
             this.gameData = gameData;
+            this.isSpeechActivated = isSpeechActivated;
+            this.isInformationPanelVisible = isInformationPanelVisible;
         }
 
         public string Serialise()
